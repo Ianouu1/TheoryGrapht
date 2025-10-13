@@ -6,6 +6,7 @@ import org.theorygrapht.model.Edge;
 import org.theorygrapht.model.Vertex;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.theorygrapht.service.BFS.getBFS;
 import static org.theorygrapht.service.Dijkstra.getDijkstra;
@@ -26,7 +27,7 @@ public class GraphController {
     }
 
     @PostMapping("/kruskal")
-    public List<Edge> kruskal() {
+    public Map<String, Object> kruskal() {
         return getKruskal();
     }
 
