@@ -22,7 +22,7 @@ public class GraphController {
     }
 
     @PostMapping("/prim")
-    public List<Edge> prim(@RequestParam String startingVertexName) { // todo Voir pour injecter un json de graph plus tard
+    public Map<String, Object> prim(@RequestParam String startingVertexName) { // todo Voir pour injecter un json de graph plus tard
         return getPrim(startingVertexName);
     }
 
