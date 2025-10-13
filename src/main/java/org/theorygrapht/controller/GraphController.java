@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.theorygrapht.service.BFS.getBFS;
+import static org.theorygrapht.service.DFS.getDFS;
 import static org.theorygrapht.service.Dijkstra.getDijkstra;
 import static org.theorygrapht.service.Kruskal.getKruskal;
 import static org.theorygrapht.service.Prim.getPrim;
@@ -39,5 +40,10 @@ public class GraphController {
     @PostMapping("/bfs")
     public List<Vertex> bfs(@RequestParam String startingVertexName) {
         return getBFS(startingVertexName);
+    }
+
+    @PostMapping("/dfs")
+    public List<Vertex> dfs(@RequestParam String startingVertexName) {
+        return getDFS(startingVertexName);
     }
 }
