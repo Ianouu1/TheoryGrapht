@@ -25,7 +25,7 @@ public class Edge {
 
 	@Override
 	public String toString() {
-		return source.getName() + " - " + target.getName() + " (" + weight + ")\n";
+		return source.getName() + " - " + target.getName() + " : " + weight + "\n";
 	}
 
 }
