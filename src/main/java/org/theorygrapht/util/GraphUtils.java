@@ -11,16 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class GraphJsonLoader {
+public class GraphUtils {
     public static Graph loadJson(String resourcePath) {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            InputStream is = GraphJsonLoader.class.getClassLoader().getResourceAsStream(resourcePath);
+            InputStream is = GraphUtils.class.getClassLoader().getResourceAsStream(resourcePath);
             if (is == null) {
                 throw new IllegalStateException("Resource not found: " + resourcePath);
             }
 
-            TypeReference<Map<String, List<Map<String,Object>>>> typeRef = new TypeReference<>() {};
+            TypeReference<Map<String, List<Map<String, Object>>>> typeRef = new TypeReference<>() {
+            };
             Map<String, List<Map<String, Object>>> raw = mapper.readValue(is, typeRef);
 
             // Create vertices
@@ -30,8 +31,8 @@ public class GraphJsonLoader {
             }
 
             // Also ensure vertices referenced only as targets are included
-            for (List<Map<String,Object>> neighbours : raw.values()) {
-                for (Map<String,Object> n : neighbours) {
+            for (List<Map<String, Object>> neighbours : raw.values()) {
+                for (Map<String, Object> n : neighbours) {
                     String name = (String) n.get("ville");
                     boolean exists = vertices.stream().anyMatch(v -> v.getName().equals(name));
                     if (!exists) vertices.add(new Vertex(name));
@@ -47,7 +48,7 @@ public class GraphJsonLoader {
             for (Map.Entry<String, List<Map<String, Object>>> e : raw.entrySet()) {
                 String from = e.getKey();
                 Vertex vf = map.get(from);
-                for (Map<String,Object> nb : e.getValue()) {
+                for (Map<String, Object> nb : e.getValue()) {
                     String to = (String) nb.get("ville");
                     int dist = ((Number) nb.get("distance")).intValue();
                     Vertex vt = map.get(to);
@@ -61,4 +62,15 @@ public class GraphJsonLoader {
             throw new RuntimeException("Failed to load graph from resource", ex);
         }
     }
+
+    public static Vertex searchVertex(Vertex[] vertices, String startingVertexName) {
+        for (Vertex v : vertices) {
+            if (v.getName().equalsIgnoreCase(startingVertexName)) {
+                return v;
+            }
+        }
+        throw new IllegalArgumentException("Vertex not found : " + startingVertexName);
+    }
 }
+
+

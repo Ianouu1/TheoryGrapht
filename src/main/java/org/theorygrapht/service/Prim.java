@@ -8,6 +8,8 @@ import org.theorygrapht.util.DummyGraph;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.theorygrapht.util.GraphUtils.searchVertex;
+
 public class Prim {
     public static List<Edge> getPrim(String startingVertexName) {
         Graph graph = DummyGraph.create();
@@ -38,14 +40,7 @@ public class Prim {
         return visitedEdges;
     }
 
-    private static Vertex searchVertex(Vertex[] vertices, String startingVertexName) {
-        for (Vertex v : vertices) {
-            if (v.getName().equalsIgnoreCase(startingVertexName)) {
-                return v;
-            }
-        }
-        throw new IllegalArgumentException("Vertex not found : " + startingVertexName);
-    }
+
 
     private static Edge getClosestEdge(Edge[] edges, List<Vertex> visited, Edge closestEdge) {
         for (Edge edge : edges) {
