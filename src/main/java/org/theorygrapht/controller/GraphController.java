@@ -6,6 +6,7 @@ import org.theorygrapht.model.Edge;
 
 import java.util.List;
 
+import static org.theorygrapht.service.Kruskal.getKruskal;
 import static org.theorygrapht.service.Prim.getPrim;
 
 @RestController
@@ -21,4 +22,8 @@ public class GraphController {
         return getPrim(startingVertexName);
     }
 
+    @PostMapping("/kruskal")
+    public List<Edge> kruskal() {
+        return getKruskal();
+    }
 }
