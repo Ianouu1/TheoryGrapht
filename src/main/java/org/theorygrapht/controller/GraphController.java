@@ -3,9 +3,11 @@ package org.theorygrapht.controller;
 import org.springframework.web.bind.annotation.*;
 
 import org.theorygrapht.model.Edge;
+import org.theorygrapht.model.Vertex;
 
 import java.util.List;
 
+import static org.theorygrapht.service.BFS.getBFS;
 import static org.theorygrapht.service.Dijkstra.getDijkstra;
 import static org.theorygrapht.service.Kruskal.getKruskal;
 import static org.theorygrapht.service.Prim.getPrim;
@@ -31,5 +33,10 @@ public class GraphController {
     @PostMapping("/dijkstra")
     public List<Edge> dijkstra(@RequestParam String start, @RequestParam String end) {
         return getDijkstra(start,end);
+    }
+
+    @PostMapping("/bfs")
+    public List<Vertex> bfs(@RequestParam String startingVertexName) {
+        return getBFS(startingVertexName);
     }
 }
