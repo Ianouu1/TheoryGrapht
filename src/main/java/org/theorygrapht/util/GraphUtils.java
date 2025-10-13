@@ -8,6 +8,7 @@ import org.theorygrapht.model.Vertex;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +57,17 @@ public class GraphUtils {
                 }
             }
 
-            return new Graph(vertices.toArray(new Vertex[0]), edges.toArray(new Edge[0]));
+            // Build adjacency list
+            Map<Vertex, List<Edge>> adjacencyList = new HashMap<>();
+            for (Vertex v : vertices) {
+                adjacencyList.put(v, new ArrayList<>());
+            }
+            for (Edge e : edges) {
+                adjacencyList.get(e.getSource()).add(e);
+                adjacencyList.get(e.getTarget()).add(e);
+            }
+
+            return new Graph(vertices.toArray(new Vertex[0]), edges.toArray(new Edge[0]), adjacencyList);
 
         } catch (Exception ex) {
             throw new RuntimeException("Failed to load graph from resource", ex);
@@ -71,6 +82,16 @@ public class GraphUtils {
         }
         throw new IllegalArgumentException("Vertex not found : " + startingVertexName);
     }
+
+    public static List<Vertex> getNeighbors(Graph graph, Vertex vertex) {
+        List<Vertex> neighbors = new ArrayList<>();
+        for (Edge e : graph.getAdjacencyList().get(vertex)) {
+            Vertex neighbor = e.getSource().equals(vertex) ? e.getTarget() : e.getSource();
+            neighbors.add(neighbor);
+        }
+        return neighbors;
+    }
+
 }
 
 
