@@ -8,7 +8,7 @@ import org.theorygrapht.util.DummyGraph;
 import java.util.*;
 
 public class Kruskal {
-    public static Map<String, Object> getKruskal(Graph graph) {
+    public static List<Edge> getKruskal(Graph graph) {
         List<Edge> edges = new ArrayList<>(Arrays.asList(graph.getEdges()));
         edges.sort(Comparator.comparingInt(Edge::getWeight));
 
@@ -19,7 +19,6 @@ public class Kruskal {
         }
 
         List<Edge> mst = new ArrayList<>();
-        int totalCost = 0;
         for (Edge e : edges) {
             Vertex root1 = find(parent, e.getSource());
             Vertex root2 = find(parent, e.getTarget());
@@ -27,14 +26,11 @@ public class Kruskal {
             // if the two vertices are not already connected
             if (!root1.equals(root2)) {
                 mst.add(e);
-                totalCost += e.getWeight();
                 parent.put(root1, root2); // union
             }
         }
         Map<String, Object> result = new HashMap<>();
-        result.put("visitedEdges", mst);
-        result.put("totalCost", totalCost);
-        return result;
+        return mst;
     }
 
     private static Vertex find(Map<Vertex, Vertex> parent, Vertex v) {

@@ -13,7 +13,7 @@ import java.util.Map;
 import static org.theorygrapht.util.GraphUtils.searchVertex;
 
 public class Prim {
-    public static Map<String, Object> getPrim(Graph graph, String startingVertexName) {
+    public static List<Edge> getPrim(Graph graph, String startingVertexName) {
         Vertex[] vertices = graph.getVertices();
         Edge[] edges = graph.getEdges();
 
@@ -21,7 +21,6 @@ public class Prim {
 
         List<Vertex> visitedVertices = new ArrayList<>();
         List<Edge> visitedEdges = new ArrayList<>();
-        int totalCost = 0;
 
         visitedVertices.add(start);
 
@@ -33,15 +32,11 @@ public class Prim {
                 throw new IllegalArgumentException("This is a disconnected graph");
             }
             visitedEdges.add(closestEdge);
-            totalCost += closestEdge.getWeight();
             if (!visitedVertices.contains(closestEdge.getTarget())) {
                 visitedVertices.add(closestEdge.getTarget());
             }
         }
-        Map<String, Object> result = new HashMap<>();
-        result.put("visitedEdges", visitedEdges);
-        result.put("totalCost", totalCost);
-        return result;
+        return visitedEdges;
     }
 
 

@@ -17,6 +17,7 @@ import static org.theorygrapht.service.Dijkstra.getDijkstra;
 import static org.theorygrapht.service.Kruskal.getKruskal;
 import static org.theorygrapht.service.Prim.getPrim;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 public class GraphController {
 
@@ -26,20 +27,20 @@ public class GraphController {
     }
 
     @PostMapping("/prim")
-    public Map<String, Object> prim(@RequestBody(required = false) Map<String, List<GraphInput.Neighbor>> graphJson,
+    public List<Edge> prim(@RequestBody Map<String, List<GraphInput.Neighbor>> graphJson,
                                     @RequestParam String startingVertexName) {
         Graph graph = GraphUtils.fromMap(graphJson);
         return getPrim(graph, startingVertexName);
     }
 
     @PostMapping("/kruskal")
-    public Map<String, Object> kruskal(@RequestBody(required = false) Map<String, List<GraphInput.Neighbor>> graphJson) {
+    public List<Edge> kruskal(@RequestBody Map<String, List<GraphInput.Neighbor>> graphJson) {
         Graph graph = GraphUtils.fromMap(graphJson);
         return getKruskal(graph);
     }
 
     @PostMapping("/dijkstra")
-    public List<Edge> dijkstra(@RequestBody(required = false) Map<String, List<GraphInput.Neighbor>> graphJson,
+    public List<Edge> dijkstra(@RequestBody Map<String, List<GraphInput.Neighbor>> graphJson,
                                @RequestParam String start,
                                @RequestParam String end) {
         Graph graph = GraphUtils.fromMap(graphJson);
@@ -47,14 +48,14 @@ public class GraphController {
     }
 
     @PostMapping("/bfs")
-    public List<Vertex> bfs(@RequestBody(required = false) Map<String, List<GraphInput.Neighbor>> graphJson,
+    public List<Edge> bfs(@RequestBody Map<String, List<GraphInput.Neighbor>> graphJson,
                             @RequestParam String startingVertexName) {
         Graph graph = GraphUtils.fromMap(graphJson);
         return getBFS(graph, startingVertexName);
     }
 
     @PostMapping("/dfs")
-    public List<Vertex> dfs(@RequestBody(required = false) Map<String, List<GraphInput.Neighbor>> graphJson,
+    public List<Edge> dfs(@RequestBody Map<String, List<GraphInput.Neighbor>> graphJson,
                             @RequestParam String startingVertexName) {
         Graph graph = GraphUtils.fromMap(graphJson);
         return getDFS(graph, startingVertexName);
