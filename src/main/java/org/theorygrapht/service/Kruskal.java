@@ -33,7 +33,7 @@ public class Kruskal {
             }
         }
         Map<String, Object> result = new HashMap<>();
-        result.put("mst", mst);
+        result.put("visitedEdges", mst);
         result.put("totalCost", totalCost);
         return result;
     }
