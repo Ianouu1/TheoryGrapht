@@ -10,8 +10,7 @@ import static org.theorygrapht.util.GraphUtils.searchVertex;
 
 public class DFS {
 
-    public static List<Vertex> getDFS(String startingVertexName) {
-        Graph graph = DummyGraph.create();
+    public static List<Vertex> getDFS(Graph graph, String startingVertexName) {
         Vertex[] vertices = graph.getVertices();
 
         Vertex start = searchVertex(vertices, startingVertexName);
@@ -20,6 +19,7 @@ public class DFS {
         List<Vertex> visitingOrder = new ArrayList<>();
         Map<Vertex, List<Vertex>> adjacency = new HashMap<>();
 
+        // todo utiliser utils
         graph.getAdjacencyList().forEach((vertex, edges) -> {
             List<Vertex> neighbors = new ArrayList<>();
             for (var edge : edges) {

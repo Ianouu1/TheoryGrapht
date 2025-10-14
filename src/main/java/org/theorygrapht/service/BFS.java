@@ -9,8 +9,7 @@ import java.util.*;
 import static org.theorygrapht.util.GraphUtils.searchVertex;
 
 public class BFS {
-    public static List<Vertex> getBFS(String startingVertexName) {
-        Graph graph = DummyGraph.create();
+    public static List<Vertex> getBFS(Graph graph, String startingVertexName) {
         Vertex[] vertices = graph.getVertices();
 
         Vertex start = searchVertex(vertices, startingVertexName);

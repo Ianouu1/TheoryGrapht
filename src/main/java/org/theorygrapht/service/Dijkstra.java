@@ -11,8 +11,7 @@ import static org.theorygrapht.util.GraphUtils.searchVertex;
 
 public class Dijkstra {
 
-    public static List<Edge> getDijkstra(String startingVertexName, String endingVertexName) {
-        Graph graph = DummyGraph.create();
+    public static List<Edge> getDijkstra(Graph graph, String startingVertexName, String endingVertexName) {
         Vertex[] vertices = graph.getVertices();
         Edge[] edges = graph.getEdges();
 

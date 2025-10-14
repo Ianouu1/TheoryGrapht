@@ -8,8 +8,7 @@ import org.theorygrapht.util.DummyGraph;
 import java.util.*;
 
 public class Kruskal {
-    public static Map<String, Object> getKruskal() {
-        Graph graph = DummyGraph.create();
+    public static Map<String, Object> getKruskal(Graph graph) {
         List<Edge> edges = new ArrayList<>(Arrays.asList(graph.getEdges()));
         edges.sort(Comparator.comparingInt(Edge::getWeight));
 

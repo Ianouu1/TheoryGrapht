@@ -13,8 +13,7 @@ import java.util.Map;
 import static org.theorygrapht.util.GraphUtils.searchVertex;
 
 public class Prim {
-    public static Map<String, Object> getPrim(String startingVertexName) {
-        Graph graph = DummyGraph.create();
+    public static Map<String, Object> getPrim(Graph graph, String startingVertexName) {
         Vertex[] vertices = graph.getVertices();
         Edge[] edges = graph.getEdges();
 

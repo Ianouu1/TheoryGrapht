@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.theorygrapht.model.Edge;
 import org.theorygrapht.model.Graph;
+import org.theorygrapht.model.GraphInput;
 import org.theorygrapht.model.Vertex;
 
 import java.io.InputStream;
@@ -92,6 +93,37 @@ public class GraphUtils {
         return neighbors;
     }
 
+    public static Graph fromMap(Map<String, List<GraphInput.Neighbor>> data) {
+        List<Vertex> vertices = new ArrayList<>();
+        List<Edge> edges = new ArrayList<>();
+        Map<String, Vertex> vertexMap = new HashMap<>();
+
+        // Création des sommets
+        for (String name : data.keySet()) {
+            Vertex v = new Vertex(name);
+            vertices.add(v);
+            vertexMap.put(name, v);
+        }
+
+        // Création des arêtes
+        for (var entry : data.entrySet()) {
+            Vertex source = vertexMap.get(entry.getKey());
+            for (GraphInput.Neighbor neighbor : entry.getValue()) {
+                Vertex target = vertexMap.get(neighbor.getVille());
+                int distance = neighbor.getDistance();
+                edges.add(new Edge(source, target, distance));
+            }
+        }
+
+        // Construction de la liste d’adjacence
+        Map<Vertex, List<Edge>> adjacencyList = new HashMap<>();
+        for (Edge e : edges) {
+            adjacencyList.computeIfAbsent(e.getSource(), k -> new ArrayList<>()).add(e);
+            adjacencyList.computeIfAbsent(e.getTarget(), k -> new ArrayList<>()).add(e);
+        }
+
+        return new Graph(vertices.toArray(new Vertex[0]), edges.toArray(new Edge[0]), adjacencyList);
+    }
 }
 
 
