@@ -1,0 +1,14 @@
+aside .popup-card {
+    position: static;
+    box-shadow: none;
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+.lancer {
+    background: #4f8e2c;
+}
+
+.reinitialiser {
+    background: #8e2c2c;
+}

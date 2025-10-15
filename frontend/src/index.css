@@ -1,0 +1,128 @@
+/* index.css — thème sombre inspiré du style Vite */
+
+:root {
+    /* Couleurs principales */
+    --bg: #0f172a;
+    --panel: #111827;
+    --border: #1f2937;
+    --fg: rgba(255, 255, 255, 0.87);
+    --muted: #9ca3af;
+    --accent: #60a5fa;
+    --accent-light: #93c5fd;
+
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+
+    color-scheme: dark;
+    color: var(--fg);
+    background-color: var(--bg);
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Liens */
+a {
+    font-weight: 500;
+    color: var(--accent);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--accent-light);
+}
+
+/* Corps */
+html, body {
+    margin: 0;
+    padding: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--fg);
+}
+
+/* Titres */
+h1 {
+    font-size: 2.4em;
+    font-weight: 600;
+    line-height: 1.1;
+}
+
+/* Boutons */
+button {
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    background-color: #1a1a1a;
+    color: var(--fg);
+    cursor: pointer;
+    transition: border-color 0.25s, background 0.25s;
+    margin: 5px;
+}
+
+button:hover {
+    border-color: var(--accent);
+}
+
+button:focus,
+button:focus-visible {
+    outline: 3px solid var(--accent);
+}
+
+/* Formulaires */
+input,
+select {
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: #0b1220;
+    color: var(--fg);
+    padding: 0 10px;
+    transition: border-color 0.2s ease;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* Layout global */
+body {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+}
+
+/* Media query : thème clair optionnel */
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg: #f8fafc;
+        --panel: #ffffff;
+        --border: #e2e8f0;
+        --fg: #1e293b;
+        --muted: #64748b;
+        --accent: #2563eb;
+        --accent-light: #3b82f6;
+
+        color-scheme: light;
+        background-color: var(--bg);
+        color: var(--fg);
+    }
+
+    button {
+        background-color: #f9f9f9;
+        color: var(--fg);
+    }
+
+    a:hover {
+        color: var(--accent-light);
+    }
+}
