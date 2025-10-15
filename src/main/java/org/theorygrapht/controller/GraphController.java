@@ -14,6 +14,7 @@ import java.util.Map;
 import static org.theorygrapht.service.BFS.getBFS;
 import static org.theorygrapht.service.DFS.getDFS;
 import static org.theorygrapht.service.Dijkstra.getDijkstra;
+import static org.theorygrapht.service.FloydWarshall.getFloydWarshall;
 import static org.theorygrapht.service.Kruskal.getKruskal;
 import static org.theorygrapht.service.Prim.getPrim;
 
@@ -28,7 +29,7 @@ public class GraphController {
 
     @PostMapping("/prim")
     public List<Edge> prim(@RequestBody Map<String, List<GraphInput.Neighbor>> graphJson,
-                                    @RequestParam String startingVertexName) {
+                           @RequestParam String startingVertexName) {
         Graph graph = GraphUtils.fromMap(graphJson);
         return getPrim(graph, startingVertexName);
     }
@@ -49,15 +50,23 @@ public class GraphController {
 
     @PostMapping("/bfs")
     public List<Edge> bfs(@RequestBody Map<String, List<GraphInput.Neighbor>> graphJson,
-                            @RequestParam String startingVertexName) {
+                          @RequestParam String startingVertexName) {
         Graph graph = GraphUtils.fromMap(graphJson);
         return getBFS(graph, startingVertexName);
     }
 
     @PostMapping("/dfs")
     public List<Edge> dfs(@RequestBody Map<String, List<GraphInput.Neighbor>> graphJson,
-                            @RequestParam String startingVertexName) {
+                          @RequestParam String startingVertexName) {
         Graph graph = GraphUtils.fromMap(graphJson);
         return getDFS(graph, startingVertexName);
+    }
+
+    @PostMapping("/floydWarshall")
+    public List<Edge> FloydWarshall(@RequestBody Map<String, List<GraphInput.Neighbor>> graphJson,
+                                    @RequestParam String start,
+                                    @RequestParam String end) {
+        Graph graph = GraphUtils.fromMap(graphJson);
+        return getFloydWarshall(graph, start, end);
     }
 }
