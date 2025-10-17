@@ -2,9 +2,16 @@ svg {
     background: #0b1220;
 }
 
+.vertexName {
+    font-size: 14px;
+    font-weight: bold;
+    text-anchor: middle;
+    text-shadow: 1px 1px 2px #000;
+    fill: #4f88cf;
+}
+
 text {
-    font-size: 12px;
-    fill: var(--muted);
+    text-shadow: 1px 1px 2px #000;
 }
 
 .node circle {
