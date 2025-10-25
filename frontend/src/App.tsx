@@ -1,24 +1,43 @@
 import React, { useState, useEffect } from "react";
 import baseGraph from "./assets/baseGraph.json";
+import bellmanFordGraph from "./assets/bellmanFordGraph.json";
+import floydWarshallGraph from "./assets/floydWarshallGraph.json";
 import Graph from "./components/Graph";
 import type { GraphNode, GraphLink } from "./components/Graph";
-import { graphToAdjacency, runKruskal, runPrim, runDFS, runBFS, runDijkstra, runFloydWarshall } from "./apiService";
+import {
+    graphToAdjacency,
+    runKruskal,
+    runPrim,
+    runDFS,
+    runBFS,
+    runDijkstra,
+    runFloydWarshall,
+} from "./apiService";
 import AlgorithmPopup from "./components/AlgorithmPopup";
 import "./App.css";
 import "./styles/_graph.css";
 import "./styles/_popup.css";
 import "./styles/_toolbar.css";
 
-function adjacencyToNodesLinks(graph: Record<string, { ville: string, distance: number }[]>) {
-    const nodes: GraphNode[] = Object.keys(graph).map(id => ({ id }));
-    const nodeMap = Object.fromEntries(nodes.map(n => [n.id, n]));
+function adjacencyToNodesLinks(
+    graph: Record<string, { ville: string; distance: number }[]>,
+    directed = false
+) {
+    const nodes: GraphNode[] = Object.keys(graph).map((id) => ({ id }));
+    const nodeMap = Object.fromEntries(nodes.map((n) => [n.id, n]));
     const links: GraphLink[] = [];
     const added = new Set<string>();
+
     for (const from in graph) {
         for (const { ville, distance } of graph[from]) {
-            const key = [from, ville].sort().join("_");
+            const key = directed ? `${from}_${ville}` : [from, ville].sort().join("_");
+
             if (!added.has(key)) {
-                links.push({ source: nodeMap[from], target: nodeMap[ville], weight: distance });
+                links.push({
+                    source: nodeMap[from],
+                    target: nodeMap[ville],
+                    weight: distance,
+                });
                 added.add(key);
             }
         }
@@ -30,10 +49,13 @@ const App: React.FC = () => {
     const [nodes, setNodes] = useState<GraphNode[]>([]);
     const [links, setLinks] = useState<GraphLink[]>([]);
     const [highlightEdges, setHighlightEdges] = useState<Record<string, string>>({});
-    const [edgeList, setEdgeList] = useState<{ source: string; target: string; weight: number }[]>([]);
+    const [edgeList, setEdgeList] = useState<
+        { source: string; target: string; weight: number }[]
+    >([]);
     const [selectedAlgo, setSelectedAlgo] = useState<string | null>(null);
     const [startNode, setStartNode] = useState("");
     const [endNode, setEndNode] = useState("");
+    const [directed, setDirected] = useState(false);
 
     useEffect(() => {
         const { nodes, links } = adjacencyToNodesLinks(baseGraph);
@@ -121,7 +143,6 @@ const App: React.FC = () => {
         }
     }
 
-    // 🧹 Fonction commune de reset (appelée par changement d’algo + bouton Réinitialiser)
     function resetState() {
         setHighlightEdges({});
         setEdgeList([]);
@@ -132,6 +153,24 @@ const App: React.FC = () => {
     function handleAlgoSelect(algo: string) {
         resetState();
         setSelectedAlgo(algo);
+
+        let chosenGraph = baseGraph;
+        let isDirected = false;
+
+        if (algo === "bellmanford") {
+            // @ts-ignore
+            chosenGraph = bellmanFordGraph;
+            isDirected = true;
+        } else if (algo === "floydwarshall") {
+            // @ts-ignore
+            chosenGraph = floydWarshallGraph;
+            isDirected = true;
+        }
+
+        const { nodes, links } = adjacencyToNodesLinks(chosenGraph, isDirected);
+        setNodes(nodes);
+        setLinks(links);
+        setDirected(isDirected);
     }
 
     return (
@@ -151,7 +190,12 @@ const App: React.FC = () => {
 
             <main>
                 <div id="stage">
-                    <Graph nodes={nodes} links={links} highlightEdges={highlightEdges} />
+                    <Graph
+                        nodes={nodes}
+                        links={links}
+                        highlightEdges={highlightEdges}
+                        directed={directed}
+                    />
                 </div>
 
                 <aside>
@@ -183,15 +227,23 @@ const App: React.FC = () => {
                                     ))}
                                 </ul>
 
-                                <hr style={{ border: "none", borderTop: "1px solid var(--border)", margin: "8px 0" }} />
+                                <hr
+                                    style={{
+                                        border: "none",
+                                        borderTop: "1px solid var(--border)",
+                                        margin: "8px 0",
+                                    }}
+                                />
                                 <p className="hint" style={{ fontWeight: "bold" }}>
                                     Total :{" "}
-                                    {edgeList.reduce((sum, e) => sum + (Number(e.weight) || 0), 0)}
+                                    {edgeList.reduce(
+                                        (sum, e) => sum + (Number(e.weight) || 0),
+                                        0
+                                    )}
                                 </p>
                             </>
                         )}
                     </div>
-
                 </aside>
             </main>
         </div>

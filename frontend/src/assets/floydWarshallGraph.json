@@ -1,0 +1,26 @@
+{
+  "s1": [
+    { "ville": "s2", "distance": 4 },
+    { "ville": "s6", "distance": 1 }
+  ],
+  "s2": [
+    { "ville": "s4", "distance": 5 }
+  ],
+  "s3": [
+    { "ville": "s1", "distance": 5 },
+    { "ville": "s6", "distance": 2 }
+  ],
+  "s4": [
+    { "ville": "s5", "distance": 3 },
+    { "ville": "s6", "distance": 3 }
+  ],
+  "s5": [
+    { "ville": "s3", "distance": 1 },
+    { "ville": "s4", "distance": -2 },
+    { "ville": "s6", "distance": 4 }
+  ],
+  "s6": [
+    { "ville": "s1", "distance": 2 },
+    { "ville": "s2", "distance": 2 }
+  ]
+}

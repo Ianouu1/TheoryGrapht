@@ -21,9 +21,10 @@ interface GraphProps {
     nodes: GraphNode[];
     links: GraphLink[];
     highlightEdges?: Record<string, string>;
+    directed?: boolean;
 }
 
-const Graph: React.FC<GraphProps> = ({ nodes, links, highlightEdges }) => {
+const Graph: React.FC<GraphProps> = ({ nodes, links, highlightEdges, directed = false }) => {
     const svgRef = useRef<SVGSVGElement>(null);
     const simRef = useRef<d3.Simulation<GraphNode, GraphLink> | null>(null);
 
@@ -40,6 +41,20 @@ const Graph: React.FC<GraphProps> = ({ nodes, links, highlightEdges }) => {
         const linkLayer = gZoom.append("g");
         const labelLayer = gZoom.append("g");
         const nodeLayer = gZoom.append("g");
+        if (directed) {
+            svg.append("defs")
+                .append("marker")
+                .attr("id", "arrowhead")
+                .attr("viewBox", "-0 -5 10 10")
+                .attr("refX", 20)
+                .attr("refY", 0)
+                .attr("orient", "auto")
+                .attr("markerWidth", 6)
+                .attr("markerHeight", 6)
+                .append("path")
+                .attr("d", "M0,-5L10,0L0,5")
+                .attr("fill", "#8b9bb4");
+        }
 
         // --- Zoom/Pan ---
         const zoom = d3
@@ -77,13 +92,16 @@ const Graph: React.FC<GraphProps> = ({ nodes, links, highlightEdges }) => {
         simRef.current = sim;
 
         const link = linkLayer
-            .selectAll("line")
+            .selectAll("path")
             .data(links)
             .enter()
-            .append("line")
+            .append("path")
             .attr("stroke", "#8b9bb4")
             .attr("stroke-opacity", 0.8)
-            .attr("stroke-width", (d) => Math.max(1.5, Math.sqrt(d.weight || 1)));
+            .attr("stroke-width", 2)
+            .attr("fill", "none")
+            .attr("marker-end", directed ? "url(#arrowhead)" : null);
+
 
         const label = labelLayer
             .selectAll("text.edgeLabel")
@@ -129,25 +147,109 @@ const Graph: React.FC<GraphProps> = ({ nodes, links, highlightEdges }) => {
             .text((d) => d.id);
 
         function ticked() {
-            link
-                .attr("x1", (d) => (d.source as GraphNode).x || 0)
-                .attr("y1", (d) => (d.source as GraphNode).y || 0)
-                .attr("x2", (d) => (d.target as GraphNode).x || 0)
-                .attr("y2", (d) => (d.target as GraphNode).y || 0)
-                .attr("stroke", (d) => {
-                    const key1 = `${(d.source as GraphNode).id}_${(d.target as GraphNode).id}`;
-                    const key2 = `${(d.target as GraphNode).id}_${(d.source as GraphNode).id}`;
-                    return highlightEdges?.[key1] || highlightEdges?.[key2] || "#8b9bb4";
-                });
+            link.attr("d", (d) => {
+                const sx = (d.source as GraphNode).x || 0;
+                const sy = (d.source as GraphNode).y || 0;
+                const tx = (d.target as GraphNode).x || 0;
+                const ty = (d.target as GraphNode).y || 0;
+
+                // Vérifie si une arête inverse existe
+                const hasReverse = links.some(
+                    (l) =>
+                        (l.source as GraphNode).id === (d.target as GraphNode).id &&
+                        (l.target as GraphNode).id === (d.source as GraphNode).id
+                );
+
+                if (hasReverse && directed) {
+                    const dx = tx - sx;
+                    const dy = ty - sy;
+                    const dr = Math.sqrt(dx * dx + dy * dy);
+                    const curveOffset = 25;
+
+                    const nx = dy / dr;
+                    const ny = -dx / dr;
+
+                    // 🔁 Calcul stable du sens de courbure :
+                    // Si (source + target) a une somme de codes ASCII paire => courbe d'un côté
+                    // sinon de l'autre
+                    const sumCharCodes = (
+                        (d.source as GraphNode).id.charCodeAt(0) +
+                        (d.target as GraphNode).id.charCodeAt(0)
+                    );
+                    const reverse = sumCharCodes % 2 === 0 ? 1 : -1;
+
+                    const cx = (sx + tx) / 2 + nx * curveOffset * reverse;
+                    const cy = (sy + ty) / 2 + ny * curveOffset * reverse;
+
+                    return `M${sx},${sy} Q${cx},${cy} ${tx},${ty}`;
+                } else {
+                    return `M${sx},${sy} L${tx},${ty}`;
+                }
+            });
 
             label
-                .attr("x", (d) => ((d.source as GraphNode).x! + (d.target as GraphNode).x!) / 2)
-                .attr("y", (d) => ((d.source as GraphNode).y! + (d.target as GraphNode).y!) / 2)
+                .attr("x", (d) => {
+                    const sx = (d.source as GraphNode).x || 0;
+                    const tx = (d.target as GraphNode).x || 0;
+                    const sy = (d.source as GraphNode).y || 0;
+                    const ty = (d.target as GraphNode).y || 0;
+
+                    const hasReverse = links.some(
+                        (l) =>
+                            (l.source as GraphNode).id === (d.target as GraphNode).id &&
+                            (l.target as GraphNode).id === (d.source as GraphNode).id
+                    );
+
+                    if (hasReverse && directed) {
+                        const dx = tx - sx;
+                        const dy = ty - sy;
+                        const dr = Math.sqrt(dx * dx + dy * dy);
+                        const nx = dy / dr;
+
+                        const sumCharCodes =
+                            (d.source as GraphNode).id.charCodeAt(0) +
+                            (d.target as GraphNode).id.charCodeAt(0);
+                        const reverse = sumCharCodes % 2 === 0 ? 1 : -1;
+                        const offset = 15; // distance entre les labels opposés
+
+                        return (sx + tx) / 2 + nx * offset * reverse;
+                    }
+                    return (sx + tx) / 2;
+                })
+                .attr("y", (d) => {
+                    const sx = (d.source as GraphNode).x || 0;
+                    const tx = (d.target as GraphNode).x || 0;
+                    const sy = (d.source as GraphNode).y || 0;
+                    const ty = (d.target as GraphNode).y || 0;
+
+                    const hasReverse = links.some(
+                        (l) =>
+                            (l.source as GraphNode).id === (d.target as GraphNode).id &&
+                            (l.target as GraphNode).id === (d.source as GraphNode).id
+                    );
+
+                    if (hasReverse && directed) {
+                        const dx = tx - sx;
+                        const dy = ty - sy;
+                        const dr = Math.sqrt(dx * dx + dy * dy);
+                        const ny = -dx / dr;
+
+                        const sumCharCodes =
+                            (d.source as GraphNode).id.charCodeAt(0) +
+                            (d.target as GraphNode).id.charCodeAt(0);
+                        const reverse = sumCharCodes % 2 === 0 ? 1 : -1;
+                        const offset = 15;
+
+                        return (sy + ty) / 2 + ny * offset * reverse;
+                    }
+                    return (sy + ty) / 2;
+                })
                 .attr("fill", (d) => {
                     const key1 = `${(d.source as GraphNode).id}_${(d.target as GraphNode).id}`;
                     const key2 = `${(d.target as GraphNode).id}_${(d.source as GraphNode).id}`;
-                    return (highlightEdges?.[key1] || highlightEdges?.[key2] || "#cbd5e1");
+                    return highlightEdges?.[key1] || highlightEdges?.[key2] || "#cbd5e1";
                 });
+
 
             node.attr("transform", (d) => `translate(${d.x ?? 0},${d.y ?? 0})`);
         }
@@ -159,7 +261,7 @@ const Graph: React.FC<GraphProps> = ({ nodes, links, highlightEdges }) => {
     useEffect(() => {
         const svg = d3.select(svgRef.current);
 
-        svg.selectAll("line").attr("stroke", (d: any) => {
+        svg.selectAll<SVGPathElement, any>("path").attr("stroke", (d) => {
             const key1 = `${d.source.id}_${d.target.id}`;
             const key2 = `${d.target.id}_${d.source.id}`;
             return highlightEdges?.[key1] || highlightEdges?.[key2] || "#8b9bb4";
