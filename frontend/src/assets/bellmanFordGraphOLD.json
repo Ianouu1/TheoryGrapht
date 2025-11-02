@@ -4,12 +4,12 @@
     { "ville": "s5", "distance": 7 }
   ],
   "s2": [
-    { "ville": "s3", "distance": 3 },
-    { "ville": "s6", "distance": 5 }
+    { "ville": "s6", "distance": 5 },
+    { "ville": "s3", "distance": 3 }
   ],
   "s3": [
     { "ville": "s4", "distance": 3 },
-    { "ville": "s5", "distance": 2 },
+    { "ville": "s5", "distance": -1 },
     { "ville": "s6", "distance": 6 }
   ],
   "s4": [

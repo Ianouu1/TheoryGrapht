@@ -5,16 +5,25 @@ const BASE_URL = "http://localhost:8080";
 
 export type Neighbor = { ville: string; distance: number };
 export type AdjacencyGraph = Record<string, Neighbor[]>;
+export type BFStep = {
+    states: Record<string, string>; // vertex -> "(d, p)"
+    list?: string[]; // Liste L (order matters)
+    choiceName?: string | null; // Choix (sommet)
+    choiceDistance?: number | null; // distance du choix
+};
 
 // Convertit nodes/links → format attendu par ton backend
-export function graphToAdjacency(nodes: GraphNode[], links: GraphLink[]): AdjacencyGraph {
+export function graphToAdjacency(nodes: GraphNode[], links: GraphLink[], directed = false): AdjacencyGraph {
     const adj: AdjacencyGraph = {};
     nodes.forEach(n => (adj[n.id] = []));
     links.forEach(l => {
         const s = typeof l.source === "object" ? l.source.id : l.source;
         const t = typeof l.target === "object" ? l.target.id : l.target;
         adj[s].push({ville: t, distance: l.weight});
-        adj[t].push({ville: s, distance: l.weight});
+        // Pour les graphes non dirigés, on ajoute aussi dans l'autre sens
+        if (!directed) {
+            adj[t].push({ville: s, distance: l.weight});
+        }
     });
     return adj;
 }
@@ -65,11 +74,29 @@ export async function runDijkstra(graph: AdjacencyGraph, start: string, end: str
     return res.json();
 }
 
-export async function runFloydWarshall(graph: any, start: string, end: string) {
+export async function runFloydWarshall(graph: AdjacencyGraph, start: string, end: string) {
     const response = await fetch(`${BASE_URL}/floydWarshall?start=${start}&end=${end}`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(graph),
     });
     return response.json();
+}
+
+export async function runBellmanFord(graph: AdjacencyGraph, start: string) {
+    const res = await fetch(`${BASE_URL}/bellmanFord?start=${start}`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(graph),
+    });
+    return res.json();
+}
+
+export async function runBellmanFordTable(graph: AdjacencyGraph, start: string): Promise<BFStep[]> {
+    const res = await fetch(`${BASE_URL}/bellmanFord/table?start=${start}`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(graph),
+    });
+    return res.json();
 }

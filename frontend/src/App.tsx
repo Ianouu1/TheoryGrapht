@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import baseGraph from "./assets/baseGraph.json";
-import bellmanFordGraph from "./assets/bellmanFordGraph.json";
-import floydWarshallGraph from "./assets/floydWarshallGraph.json";
 import Graph from "./components/Graph";
-import type { GraphNode, GraphLink } from "./components/Graph";
+import DirectedGraph from "./components/DirectedGraph";
+import type {GraphNode, GraphLink} from "./components/Graph";
 import {
     graphToAdjacency,
     runKruskal,
@@ -12,38 +11,17 @@ import {
     runBFS,
     runDijkstra,
     runFloydWarshall,
+    runBellmanFord,
+    runBellmanFordTable,
+    type BFStep,
 } from "./apiService";
+import Toolbar from "./components/Toolbar";
 import AlgorithmPopup from "./components/AlgorithmPopup";
+import Result from "./components/Result";
 import "./App.css";
 import "./styles/_graph.css";
 import "./styles/_popup.css";
 import "./styles/_toolbar.css";
-
-function adjacencyToNodesLinks(
-    graph: Record<string, { ville: string; distance: number }[]>,
-    directed = false
-) {
-    const nodes: GraphNode[] = Object.keys(graph).map((id) => ({ id }));
-    const nodeMap = Object.fromEntries(nodes.map((n) => [n.id, n]));
-    const links: GraphLink[] = [];
-    const added = new Set<string>();
-
-    for (const from in graph) {
-        for (const { ville, distance } of graph[from]) {
-            const key = directed ? `${from}_${ville}` : [from, ville].sort().join("_");
-
-            if (!added.has(key)) {
-                links.push({
-                    source: nodeMap[from],
-                    target: nodeMap[ville],
-                    weight: distance,
-                });
-                added.add(key);
-            }
-        }
-    }
-    return { nodes, links };
-}
 
 const App: React.FC = () => {
     const [nodes, setNodes] = useState<GraphNode[]>([]);
@@ -52,75 +30,149 @@ const App: React.FC = () => {
     const [edgeList, setEdgeList] = useState<
         { source: string; target: string; weight: number }[]
     >([]);
+    const [bfTable, setBfTable] = useState<BFStep[] | null>(null);
+    const [directed, setDirected] = useState(false);
     const [selectedAlgo, setSelectedAlgo] = useState<string | null>(null);
     const [startNode, setStartNode] = useState("");
     const [endNode, setEndNode] = useState("");
-    const [directed, setDirected] = useState(false);
 
+    // Initialiser avec baseGraph au chargement
     useEffect(() => {
-        const { nodes, links } = adjacencyToNodesLinks(baseGraph);
+        const nodes: GraphNode[] = Object.keys(baseGraph).map((id) => ({id}));
+        const nodeMap = Object.fromEntries(nodes.map((n) => [n.id, n]));
+        const links: GraphLink[] = [];
+        const added = new Set<string>();
+
+        for (const from in baseGraph) {
+            for (const {ville, distance} of baseGraph[from as keyof typeof baseGraph]) {
+                const key = [from, ville].sort().join("_");
+
+                if (!added.has(key)) {
+                    links.push({
+                        source: nodeMap[from],
+                        target: nodeMap[ville],
+                        weight: distance,
+                    });
+                    added.add(key);
+                }
+            }
+        }
         setNodes(nodes);
         setLinks(links);
     }, []);
 
+    // If user switches away from Bellman-Ford, clear any previous BF table
+    useEffect(() => {
+        if (selectedAlgo !== "bellmanford" && bfTable) {
+            setBfTable(null);
+        }
+    }, [selectedAlgo]);
+
     async function handleSendGraph(algorithm: string, start?: string, end?: string) {
-        const adj = graphToAdjacency(nodes, links);
+        // If we're not running Bellman-Ford, ensure any previous BF table is cleared
+        if (algorithm !== "bellmanford") {
+            setBfTable(null);
+        }
+    const adj = graphToAdjacency(nodes, links, directed);
         let result: any;
 
-        switch (algorithm) {
-            case "bfs":
-                if (!start) return alert("Choisis un sommet de départ");
-                result = await runBFS(adj, start);
-                break;
-            case "dfs":
-                if (!start) return alert("Choisis un sommet de départ");
-                result = await runDFS(adj, start);
-                break;
-            case "kruskal":
-                result = await runKruskal(adj);
-                break;
-            case "prim":
-                if (!start) return alert("Choisis un sommet de départ");
-                result = await runPrim(adj, start);
-                break;
-            case "dijkstra":
-                if (!start || !end) return alert("Choisis deux sommets");
-                result = await runDijkstra(adj, start, end);
-                break;
-            case "floydwarshall":
-                if (!start || !end) return alert("Choisis deux sommets");
-                result = await runFloydWarshall(adj, start, end);
-                break;
-            default:
-                return;
+        try {
+            switch (algorithm) {
+                case "bfs":
+                    if (!start) return alert("Choisis un sommet de départ");
+                    result = await runBFS(adj, start);
+                    break;
+                case "dfs":
+                    if (!start) return alert("Choisis un sommet de départ");
+                    result = await runDFS(adj, start);
+                    break;
+                case "kruskal":
+                    result = await runKruskal(adj);
+                    break;
+                case "prim":
+                    if (!start) return alert("Choisis un sommet de départ");
+                    result = await runPrim(adj, start);
+                    break;
+                case "dijkstra":
+                    if (!start || !end) return alert("Choisis deux sommets");
+                    result = await runDijkstra(adj, start, end);
+                    break;
+                case "floydwarshall":
+                    if (!start || !end) return alert("Choisis deux sommets");
+                    result = await runFloydWarshall(adj, start, end);
+                    break;
+                case "bellmanford":
+                    if (!start) return alert("Choisis un sommet de départ");
+                    // For BF, fetch BOTH: edges for visualization and table for the side panel
+                    const [bfEdges, bfSteps] = await Promise.all([
+                        runBellmanFord(adj, start),
+                        runBellmanFordTable(adj, start),
+                    ]);
+
+                    // Update table
+                    setBfTable(bfSteps as BFStep[]);
+
+                    // Clear previous visuals and do the edge highlight animation
+                    setHighlightEdges({});
+                    setEdgeList([]); // we don't display an edge list for BF
+
+                    await new Promise((resolve) => setTimeout(resolve, 100));
+
+                    const newColorsBF: Record<string, string> = {};
+                    const edgesBF = (bfEdges || []).filter((e: any) => e.source && e.target);
+                    edgesBF.forEach((e: any, i: number) => {
+                        const s = e.source.name || e.source;
+                        const t = e.target.name || e.target;
+                        setTimeout(() => {
+                            newColorsBF[`${s}_${t}`] = "#ef1e1e";
+                            newColorsBF[`${t}_${s}`] = "#ef1e1e";
+                            setHighlightEdges((prev) => ({ ...prev, ...newColorsBF }));
+                        }, i * 400);
+                    });
+                    return; // handled fully here
+                default:
+                    return;
+            }
+
+            if (result && Array.isArray(result)) {
+                // Clear any BF table when algorithms return edges
+                setBfTable(null);
+                setHighlightEdges({});
+                setEdgeList([]);
+
+                await new Promise((resolve) => setTimeout(resolve, 100));
+
+                const newColors: Record<string, string> = {};
+                const edges = result.filter((e: any) => e.source && e.target);
+
+                const list = edges.map((e: any) => ({
+                    source: e.source.name || e.source,
+                    target: e.target.name || e.target,
+                    weight: e.weight || 0,
+                }));
+                setEdgeList(list);
+
+                edges.forEach((e: any, i: number) => {
+                    const s = e.source.name || e.source;
+                    const t = e.target.name || e.target;
+                    setTimeout(() => {
+                        // Toujours poser les deux sens; chaque composant (orienté vs non orienté)
+                        // décide de l'interprétation à l'affichage.
+                        newColors[`${s}_${t}`] = "#ef1e1e";
+                        newColors[`${t}_${s}`] = "#ef1e1e";
+                        setHighlightEdges((prev) => ({...prev, ...newColors}));
+                    }, i * 400);
+                });
+            }
+        } catch (error: any) {
+            alert(error.message || "Une erreur est survenue lors de l'exécution de l'algorithme");
         }
+    }
 
-        if (result && Array.isArray(result)) {
-            setHighlightEdges({});
-            setEdgeList([]);
-
-            await new Promise((resolve) => setTimeout(resolve, 100));
-
-            const newColors: Record<string, string> = {};
-            const edges = result.filter((e: any) => e.source && e.target);
-
-            const list = edges.map((e: any) => ({
-                source: e.source.name || e.source,
-                target: e.target.name || e.target,
-                weight: e.weight || 0,
-            }));
-            setEdgeList(list);
-
-            edges.forEach((e: any, i: number) => {
-                const s = e.source.name || e.source;
-                const t = e.target.name || e.target;
-                setTimeout(() => {
-                    newColors[`${s}_${t}`] = "#ef1e1e";
-                    newColors[`${t}_${s}`] = "#ef1e1e";
-                    setHighlightEdges((prev) => ({ ...prev, ...newColors }));
-                }, i * 400);
-            });
-        }
+    function resetState() {
+        setHighlightEdges({});
+        setEdgeList([]);
+        setBfTable(null);
     }
 
     function handleLaunch() {
@@ -129,73 +181,53 @@ const App: React.FC = () => {
             case "bfs":
             case "dfs":
             case "prim":
+            case "bellmanford":
                 handleSendGraph(selectedAlgo, startNode);
                 break;
             case "dijkstra":
+            case "floydwarshall":
                 handleSendGraph(selectedAlgo, startNode, endNode);
                 break;
             case "kruskal":
                 handleSendGraph("kruskal");
                 break;
-            case "floydwarshall":
-                handleSendGraph(selectedAlgo, startNode, endNode);
-                break;
         }
     }
 
-    function resetState() {
-        setHighlightEdges({});
-        setEdgeList([]);
+    function handleCancel() {
+        setSelectedAlgo(null);
         setStartNode("");
         setEndNode("");
-    }
-
-    function handleAlgoSelect(algo: string) {
         resetState();
-        setSelectedAlgo(algo);
-
-        let chosenGraph = baseGraph;
-        let isDirected = false;
-
-        if (algo === "bellmanford") {
-            // @ts-ignore
-            chosenGraph = bellmanFordGraph;
-            isDirected = true;
-        } else if (algo === "floydwarshall") {
-            // @ts-ignore
-            chosenGraph = floydWarshallGraph;
-            isDirected = true;
-        }
-
-        const { nodes, links } = adjacencyToNodesLinks(chosenGraph, isDirected);
-        setNodes(nodes);
-        setLinks(links);
-        setDirected(isDirected);
     }
 
     return (
         <div className="app">
-            <header>
-                <h1>TheoryGrapht</h1>
-                <div className="toolbar group">
-                    <label>Algorithmes</label>
-                    <button onClick={() => handleAlgoSelect("bfs")}>BFS</button>
-                    <button onClick={() => handleAlgoSelect("dfs")}>DFS</button>
-                    <button onClick={() => handleAlgoSelect("prim")}>Prim</button>
-                    <button onClick={() => handleAlgoSelect("dijkstra")}>Dijkstra</button>
-                    <button onClick={() => handleAlgoSelect("kruskal")}>Kruskal</button>
-                    <button onClick={() => handleAlgoSelect("floydwarshall")}>Floyd-Warshall</button>
-                </div>
-            </header>
+            <Toolbar
+                setNodes={setNodes}
+                setLinks={setLinks}
+                setDirected={setDirected}
+                onReset={resetState}
+                setSelectedAlgo={setSelectedAlgo}
+                setStartNode={setStartNode}
+                setEndNode={setEndNode}
+            />
 
             <main>
                 <div id="stage">
-                    <Graph
-                        nodes={nodes}
-                        links={links}
-                        highlightEdges={highlightEdges}
-                        directed={directed}
-                    />
+                    {directed ? (
+                        <DirectedGraph
+                            nodes={nodes}
+                            links={links}
+                            highlightEdges={highlightEdges}
+                        />
+                    ) : (
+                        <Graph
+                            nodes={nodes}
+                            links={links}
+                            highlightEdges={highlightEdges}
+                        />
+                    )}
                 </div>
 
                 <aside>
@@ -207,43 +239,10 @@ const App: React.FC = () => {
                         setStartNode={setStartNode}
                         setEndNode={setEndNode}
                         onLaunch={handleLaunch}
-                        onCancel={() => {
-                            setSelectedAlgo(null);
-                            resetState();
-                        }}
+                        onCancel={handleCancel}
                     />
 
-                    <div className="card">
-                        <h2>Résultat {edgeList.length > 0 && `(${edgeList.length} arêtes)`}</h2>
-                        {edgeList.length === 0 ? (
-                            <p className="hint">Aucun résultat pour le moment.</p>
-                        ) : (
-                            <>
-                                <ul className="hint">
-                                    {edgeList.map((e, i) => (
-                                        <li key={i}>
-                                            {e.source} → {e.target} : <b>{e.weight}</b>
-                                        </li>
-                                    ))}
-                                </ul>
-
-                                <hr
-                                    style={{
-                                        border: "none",
-                                        borderTop: "1px solid var(--border)",
-                                        margin: "8px 0",
-                                    }}
-                                />
-                                <p className="hint" style={{ fontWeight: "bold" }}>
-                                    Total :{" "}
-                                    {edgeList.reduce(
-                                        (sum, e) => sum + (Number(e.weight) || 0),
-                                        0
-                                    )}
-                                </p>
-                            </>
-                        )}
-                    </div>
+                    <Result edgeList={edgeList} bfTable={bfTable} />
                 </aside>
             </main>
         </div>

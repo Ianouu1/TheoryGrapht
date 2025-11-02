@@ -1,17 +1,18 @@
 package org.theorygrapht.controller;
-
 import org.springframework.web.bind.annotation.*;
 
 import org.theorygrapht.model.Edge;
 import org.theorygrapht.model.Graph;
 import org.theorygrapht.model.GraphInput;
-import org.theorygrapht.model.Vertex;
 import org.theorygrapht.util.GraphUtils;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.theorygrapht.service.BFS.getBFS;
+import static org.theorygrapht.service.BellmanFord.getBellmanFordPath;
+import static org.theorygrapht.service.BellmanFord.getBellmanFordTable;
+import org.theorygrapht.model.BelmanFordTableLine;
 import static org.theorygrapht.service.DFS.getDFS;
 import static org.theorygrapht.service.Dijkstra.getDijkstra;
 import static org.theorygrapht.service.FloydWarshall.getFloydWarshall;
@@ -68,5 +69,20 @@ public class GraphController {
                                     @RequestParam String end) {
         Graph graph = GraphUtils.fromMap(graphJson);
         return getFloydWarshall(graph, start, end);
+    }
+
+    @PostMapping("/bellmanFord")
+    public List<Edge> bellmanFord(@RequestBody Map<String, List<GraphInput.Neighbor>> graphJson,
+                                  @RequestParam String start) {
+        Graph graph = GraphUtils.fromMap(graphJson);
+        return getBellmanFordPath(graph, start);
+    }
+
+    @PostMapping("/bellmanFord/table")
+    public List<BelmanFordTableLine> bellmanFordTable(
+            @RequestBody Map<String, List<GraphInput.Neighbor>> graphJson,
+            @RequestParam String start) {
+        Graph graph = GraphUtils.fromMap(graphJson);
+        return getBellmanFordTable(graph, start);
     }
 }

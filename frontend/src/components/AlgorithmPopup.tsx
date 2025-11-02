@@ -32,7 +32,7 @@ const AlgorithmPopup: React.FC<AlgorithmPopupProps> = ({
 
         {algo && (
             <>
-                {(algo === "bfs" || algo === "dfs" || algo === "prim" || algo === "dijkstra" || algo === "floydwarshall") && (
+                {(algo === "bfs" || algo === "dfs" || algo === "prim" || algo === "dijkstra" || algo === "floydwarshall" || algo === "bellmanford") && (
                     <div className="row">
                         <label>Sommet de départ :</label>
                         <select
@@ -51,7 +51,7 @@ const AlgorithmPopup: React.FC<AlgorithmPopupProps> = ({
 
                 {(algo === "dijkstra" || algo === "floydwarshall") && (
                     <div className="row">
-                        <label>Sommet d’arrivée :</label>
+                        <label>Sommet d'arrivée :</label>
                         <select
                             value={endNode}
                             onChange={(e) => setEndNode(e.target.value)}
