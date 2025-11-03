@@ -44,13 +44,13 @@ const App: React.FC = () => {
         const added = new Set<string>();
 
         for (const from in baseGraph) {
-            for (const {ville, distance} of baseGraph[from as keyof typeof baseGraph]) {
-                const key = [from, ville].sort().join("_");
+            for (const {target, distance} of baseGraph[from as keyof typeof baseGraph]) {
+                const key = [from, target].sort().join("_");
 
                 if (!added.has(key)) {
                     links.push({
                         source: nodeMap[from],
-                        target: nodeMap[ville],
+                        target: nodeMap[target],
                         weight: distance,
                     });
                     added.add(key);

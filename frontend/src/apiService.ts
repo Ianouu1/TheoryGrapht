@@ -3,7 +3,7 @@ import type {GraphNode, GraphLink} from "./components/Graph";
 
 const BASE_URL = "http://localhost:8080";
 
-export type Neighbor = { ville: string; distance: number };
+export type Neighbor = { target: string; distance: number };
 export type AdjacencyGraph = Record<string, Neighbor[]>;
 export type BFStep = {
     states: Record<string, string>; // vertex -> "(d, p)"
@@ -19,10 +19,10 @@ export function graphToAdjacency(nodes: GraphNode[], links: GraphLink[], directe
     links.forEach(l => {
         const s = typeof l.source === "object" ? l.source.id : l.source;
         const t = typeof l.target === "object" ? l.target.id : l.target;
-        adj[s].push({ville: t, distance: l.weight});
+        adj[s].push({target: t, distance: l.weight});
         // Pour les graphes non dirigés, on ajoute aussi dans l'autre sens
         if (!directed) {
-            adj[t].push({ville: s, distance: l.weight});
+            adj[t].push({target: s, distance: l.weight});
         }
     });
     return adj;

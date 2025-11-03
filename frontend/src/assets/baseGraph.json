@@ -1,62 +1,62 @@
 {
   "Rennes": [
-    { "ville": "Bordeaux", "distance": 130 },
-    { "ville": "Caen", "distance": 75 },
-    { "ville": "Nantes", "distance": 45 },
-    { "ville": "Paris", "distance": 110 }
+    { "target": "Bordeaux", "distance": 130 },
+    { "target": "Caen", "distance": 75 },
+    { "target": "Nantes", "distance": 45 },
+    { "target": "Paris", "distance": 110 }
   ],
   "Bordeaux": [
-    { "ville": "Rennes", "distance": 130 },
-    { "ville": "Nantes", "distance": 90 },
-    { "ville": "Paris", "distance": 150 },
-    { "ville": "Lyon", "distance": 100 }
+    { "target": "Rennes", "distance": 130 },
+    { "target": "Nantes", "distance": 90 },
+    { "target": "Paris", "distance": 150 },
+    { "target": "Lyon", "distance": 100 }
   ],
   "Caen": [
-    { "ville": "Rennes", "distance": 75 },
-    { "ville": "Paris", "distance": 50 },
-    { "ville": "Lille", "distance": 65 }
+    { "target": "Rennes", "distance": 75 },
+    { "target": "Paris", "distance": 50 },
+    { "target": "Lille", "distance": 65 }
   ],
   "Nantes": [
-    { "ville": "Rennes", "distance": 45 },
-    { "ville": "Bordeaux", "distance": 90 },
-    { "ville": "Paris", "distance": 80 }
+    { "target": "Rennes", "distance": 45 },
+    { "target": "Bordeaux", "distance": 90 },
+    { "target": "Paris", "distance": 80 }
   ],
   "Paris": [
-    { "ville": "Rennes", "distance": 110 },
-    { "ville": "Bordeaux", "distance": 150 },
-    { "ville": "Caen", "distance": 50 },
-    { "ville": "Nantes", "distance": 80 },
-    { "ville": "Lille", "distance": 70 },
-    { "ville": "Dijon", "distance": 60 }
+    { "target": "Rennes", "distance": 110 },
+    { "target": "Bordeaux", "distance": 150 },
+    { "target": "Caen", "distance": 50 },
+    { "target": "Nantes", "distance": 80 },
+    { "target": "Lille", "distance": 70 },
+    { "target": "Dijon", "distance": 60 }
   ],
   "Lille": [
-    { "ville": "Caen", "distance": 65 },
-    { "ville": "Paris", "distance": 70 },
-    { "ville": "Nancy", "distance": 100 },
-    { "ville": "Dijon", "distance": 120 }
+    { "target": "Caen", "distance": 65 },
+    { "target": "Paris", "distance": 70 },
+    { "target": "Nancy", "distance": 100 },
+    { "target": "Dijon", "distance": 120 }
   ],
   "Dijon": [
-    { "ville": "Paris", "distance": 60 },
-    { "ville": "Lille", "distance": 120 },
-    { "ville": "Nancy", "distance": 75 },
-    { "ville": "Lyon", "distance": 70 },
-    { "ville": "Grenoble", "distance": 75 }
+    { "target": "Paris", "distance": 60 },
+    { "target": "Lille", "distance": 120 },
+    { "target": "Nancy", "distance": 75 },
+    { "target": "Lyon", "distance": 70 },
+    { "target": "Grenoble", "distance": 75 }
   ],
   "Grenoble": [
-    { "ville": "Dijon", "distance": 75 },
-    { "ville": "Lyon", "distance": 40 },
-    { "ville": "Nancy", "distance": 80 }
+    { "target": "Dijon", "distance": 75 },
+    { "target": "Lyon", "distance": 40 },
+    { "target": "Nancy", "distance": 80 }
   ],
   "Nancy": [
-    { "ville": "Lille", "distance": 100 },
-    { "ville": "Dijon", "distance": 75 },
-    { "ville": "Grenoble", "distance": 80 },
-    { "ville": "Lyon", "distance": 90 }
+    { "target": "Lille", "distance": 100 },
+    { "target": "Dijon", "distance": 75 },
+    { "target": "Grenoble", "distance": 80 },
+    { "target": "Lyon", "distance": 90 }
   ],
   "Lyon": [
-    { "ville": "Bordeaux", "distance": 100 },
-    { "ville": "Dijon", "distance": 70 },
-    { "ville": "Grenoble", "distance": 40 },
-    { "ville": "Nancy", "distance": 90 }
+    { "target": "Bordeaux", "distance": 100 },
+    { "target": "Dijon", "distance": 70 },
+    { "target": "Grenoble", "distance": 40 },
+    { "target": "Nancy", "distance": 90 }
   ]
 }

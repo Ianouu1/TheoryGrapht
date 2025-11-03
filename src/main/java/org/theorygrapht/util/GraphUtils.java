@@ -35,7 +35,7 @@ public class GraphUtils {
             // Also ensure vertices referenced only as targets are included
             for (List<Map<String, Object>> neighbours : raw.values()) {
                 for (Map<String, Object> n : neighbours) {
-                    String name = (String) n.get("ville");
+                    String name = (String) n.get("target");
                     boolean exists = vertices.stream().anyMatch(v -> v.getName().equals(name));
                     if (!exists) vertices.add(new Vertex(name));
                 }
@@ -51,9 +51,9 @@ public class GraphUtils {
                 String from = e.getKey();
                 Vertex vf = map.get(from);
                 for (Map<String, Object> nb : e.getValue()) {
-                    String to = (String) nb.get("ville");
+                    String target = (String) nb.get("target");
                     int dist = ((Number) nb.get("distance")).intValue();
-                    Vertex vt = map.get(to);
+                    Vertex vt = map.get(target);
                     edges.add(new Edge(vf, vt, dist));
                 }
             }
@@ -109,7 +109,7 @@ public class GraphUtils {
         for (var entry : data.entrySet()) {
             Vertex source = vertexMap.get(entry.getKey());
             for (GraphInput.Neighbor neighbor : entry.getValue()) {
-                Vertex target = vertexMap.get(neighbor.getVille());
+                Vertex target = vertexMap.get(neighbor.getTarget());
                 int distance = neighbor.getDistance();
                 edges.add(new Edge(source, target, distance));
             }

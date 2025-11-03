@@ -6,7 +6,7 @@ import floydWarshallGraph from "../assets/floydWarshallGraph.json";
 
 // Conversion pour graphes non dirigés (bidirectionnels)
 function adjacencyToNodesLinksUndirected(
-    graph: Record<string, { ville: string; distance: number }[]>
+    graph: Record<string, { target: string; distance: number }[]>
 ) {
     const nodes: GraphNode[] = Object.keys(graph).map((id) => ({ id }));
     const nodeMap = Object.fromEntries(nodes.map((n) => [n.id, n]));
@@ -16,18 +16,18 @@ function adjacencyToNodesLinksUndirected(
     for (const from in graph) {
         const neighbors = graph[from];
         if (!neighbors || !Array.isArray(neighbors)) continue;
-        
+
         for (const neighbor of neighbors) {
-            if (!neighbor || !neighbor.ville) continue;
-            
-            const { ville, distance } = neighbor;
+            if (!neighbor || !neighbor.target) continue;
+
+            const { target, distance } = neighbor;
             // Pour les graphes non dirigés, on utilise une clé symétrique
-            const key = [from, ville].sort().join("_");
+            const key = [from, target].sort().join("_");
 
             if (!added.has(key)) {
                 links.push({
                     source: nodeMap[from],
-                    target: nodeMap[ville],
+                    target: nodeMap[target],
                     weight: distance || 0,
                 });
                 added.add(key);
@@ -39,7 +39,7 @@ function adjacencyToNodesLinksUndirected(
 
 // Conversion pour graphes dirigés (unidirectionnels)
 function adjacencyToNodesLinksDirected(
-    graph: Record<string, { ville: string; distance: number }[]>
+    graph: Record<string, { target: string; distance: number }[]>
 ) {
     const nodes: GraphNode[] = Object.keys(graph).map((id) => ({ id }));
     const nodeMap = Object.fromEntries(nodes.map((n) => [n.id, n]));
@@ -49,18 +49,18 @@ function adjacencyToNodesLinksDirected(
     for (const from in graph) {
         const neighbors = graph[from];
         if (!neighbors || !Array.isArray(neighbors)) continue;
-        
+
         for (const neighbor of neighbors) {
-            if (!neighbor || !neighbor.ville) continue;
-            
-            const { ville, distance } = neighbor;
+            if (!neighbor || !neighbor.target) continue;
+
+            const { target, distance } = neighbor;
             // Pour les graphes dirigés, on utilise une clé directionnelle
-            const key = `${from}_${ville}`;
+            const key = `${from}_${target}`;
 
             if (!added.has(key)) {
                 links.push({
                     source: nodeMap[from],
-                    target: nodeMap[ville],
+                    target: nodeMap[target],
                     weight: distance || 0,
                 });
                 added.add(key);
@@ -98,26 +98,26 @@ const Toolbar: React.FC<ToolbarProps> = ({
             setEndNode("");
             onReset();
 
-            let chosenGraph: Record<string, { ville: string; distance: number }[]> = baseGraph as Record<string, { ville: string; distance: number }[]>;
+            let chosenGraph: Record<string, { target: string; distance: number }[]> = baseGraph as Record<string, { target: string; distance: number }[]>;
             let isDirected = false;
             let newNodes: GraphNode[] = [];
             let newLinks: GraphLink[] = [];
 
             if (algo === "bellmanford") {
-                chosenGraph = bellmanFordGraph as Record<string, { ville: string; distance: number }[]>;
+                chosenGraph = bellmanFordGraph as Record<string, { target: string; distance: number }[]>;
                 isDirected = true;
                 const result = adjacencyToNodesLinksDirected(chosenGraph);
                 newNodes = result.nodes;
                 newLinks = result.links;
             } else if (algo === "floydwarshall") {
-                chosenGraph = floydWarshallGraph as Record<string, { ville: string; distance: number }[]>;
+                chosenGraph = floydWarshallGraph as Record<string, { target: string; distance: number }[]>;
                 isDirected = true;
                 const result = adjacencyToNodesLinksDirected(chosenGraph);
                 newNodes = result.nodes;
                 newLinks = result.links;
             } else {
                 // BFS, DFS, Prim, Dijkstra, Kruskal utilisent baseGraph (non dirigé)
-                chosenGraph = baseGraph as Record<string, { ville: string; distance: number }[]>;
+                chosenGraph = baseGraph as Record<string, { target: string; distance: number }[]>;
                 isDirected = false;
                 const result = adjacencyToNodesLinksUndirected(chosenGraph);
                 newNodes = result.nodes;

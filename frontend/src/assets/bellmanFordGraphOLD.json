@@ -1,26 +1,26 @@
 {
   "s1": [
-    { "ville": "s2", "distance": 4 },
-    { "ville": "s5", "distance": 7 }
+    { "target": "s2", "distance": 4 },
+    { "target": "s5", "distance": 7 }
   ],
   "s2": [
-    { "ville": "s6", "distance": 5 },
-    { "ville": "s3", "distance": 3 }
+    { "target": "s6", "distance": 5 },
+    { "target": "s3", "distance": 3 }
   ],
   "s3": [
-    { "ville": "s4", "distance": 3 },
-    { "ville": "s5", "distance": -1 },
-    { "ville": "s6", "distance": 6 }
+    { "target": "s4", "distance": 3 },
+    { "target": "s5", "distance": -1 },
+    { "target": "s6", "distance": 6 }
   ],
   "s4": [
   ],
   "s5": [
-    { "ville": "s2", "distance": -4 },
-    { "ville": "s3", "distance": -1 },
-    { "ville": "s6", "distance": 3 }
+    { "target": "s2", "distance": -4 },
+    { "target": "s3", "distance": -1 },
+    { "target": "s6", "distance": 3 }
   ],
   "s6": [
-    { "ville": "s3", "distance": -2 },
-    { "ville": "s4", "distance": 2 }
+    { "target": "s3", "distance": -2 },
+    { "target": "s4", "distance": 2 }
   ]
 }

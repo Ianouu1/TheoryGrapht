@@ -15,15 +15,15 @@ public class GraphInput {
     }
 
     public static class Neighbor {
-        private String ville;
+        private String target;
         private int distance;
 
-        public String getVille() {
-            return ville;
+        public String getTarget() {
+            return target;
         }
 
-        public void setVille(String ville) {
-            this.ville = ville;
+        public void setTarget(String target) {
+            this.target = target;
         }
 
         public int getDistance() {
