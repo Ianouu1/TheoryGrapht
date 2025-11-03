@@ -25,71 +25,72 @@ export default function Result({ edgeList, bfTable, fwMatrices, algo, startNode 
     return (
       <div className="card">
         <h2>Floyd–Warshall</h2>
-        <h3 style={{ marginTop: 8 }}>Matrice des distances</h3>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+  <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "flex-start" }}>
+          <div style={{ flex: "1 1 60%", minWidth: 0 }}>
+            <h3 style={{ marginTop: 8 }}>Matrice des distances</h3>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
           <thead>
           <tr>
-            <th style={{ textAlign: "left", padding: 6 }}></th>
+            <th style={{ textAlign: "left", padding: 4, background: "rgba(255,255,255,0.25)", borderBottom: "1px solid var(--border)" }}></th>
             {verts.map((v) => (
-              <th key={`d-h-${v}`} style={{ textAlign: "center", padding: 6 }}>{v}</th>
+              <th key={`d-h-${v}`} style={{ textAlign: "center", padding: 4, background: "rgba(255,255,255,0.25)", borderBottom: "1px solid var(--border)" }}>{v}</th>
             ))}
           </tr>
           </thead>
           <tbody>
           {verts.map((i) => (
             <tr key={`d-r-${i}`}>
-              <th style={{ textAlign: "left", padding: 6 }}>{i}</th>
+              <th style={{ textAlign: "center", padding: 4, background: "rgba(255,255,255,0.25)", borderBottom: "1px solid var(--border)" }}>{i}</th>
               {verts.map((j) => {
                 const val = fwMatrices.dist?.[i]?.[j];
                 const text = val == null ? "–" : (isInf(val) ? "∞" : String(val));
-                return <td key={`d-c-${i}-${j}`} style={{ textAlign: "center", padding: 6, borderBottom: "1px solid var(--border)" }}>{text}</td>;
+                return <td key={`d-c-${i}-${j}`} style={{ textAlign: "center", padding: 4, borderBottom: "1px solid var(--border)" }}>{text}</td>;
               })}
             </tr>
           ))}
           </tbody>
         </table>
 
-        <h3 style={{ marginTop: 12 }}>Matrice des pères</h3>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <h3 style={{ marginTop: 12 }}>Matrice des pères</h3>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
           <thead>
           <tr>
-            <th style={{ textAlign: "left", padding: 6 }}></th>
+            <th style={{ textAlign: "left", padding: 4, background: "rgba(255,255,255,0.25)", borderBottom: "1px solid var(--border)" }}></th>
             {verts.map((v) => (
-              <th key={`n-h-${v}`} style={{ textAlign: "center", padding: 6 }}>{v}</th>
+              <th key={`n-h-${v}`} style={{ textAlign: "center", padding: 4, background: "rgba(255,255,255,0.25)", borderBottom: "1px solid var(--border)" }}>{v}</th>
             ))}
           </tr>
           </thead>
           <tbody>
           {verts.map((i) => (
             <tr key={`n-r-${i}`}>
-              <th style={{ textAlign: "left", padding: 6 }}>{i}</th>
+              <th style={{ textAlign: "left", padding: 4, background: "rgba(255,255,255,0.25)", borderBottom: "1px solid var(--border)" }}>{i}</th>
               {verts.map((j) => {
                 const val = fwMatrices.next?.[i]?.[j];
                 const text = val == null ? "–" : String(val);
-                return <td key={`n-c-${i}-${j}`} style={{ textAlign: "center", padding: 6, borderBottom: "1px solid var(--border)" }}>{text}</td>;
+                return <td key={`n-c-${i}-${j}`} style={{ textAlign: "center", padding: 4, borderBottom: "1px solid var(--border)" }}>{text}</td>;
               })}
             </tr>
           ))}
           </tbody>
         </table>
-
-  {/* On peut aussi afficher le chemin demandé en-dessous */}
-        {edgeList?.length > 0 && (
-          <>
-            <hr style={{ border: "none", borderTop: "1px solid var(--border)", margin: "8px 0" }} />
-            <h3 style={{ marginTop: 8 }}>Chemin demandé</h3>
-            <ul className="hint">
-              {edgeList.map((e, i) => (
-                <li key={i}>
-                  {e.source} → {e.target} : <b>{e.weight}</b>
-                </li>
-              ))}
-            </ul>
-            <p className="hint" style={{ fontWeight: 700 }}>
-              Total : {edgeList.reduce((sum, e) => sum + (Number(e.weight) || 0), 0)}
-            </p>
-          </>
-        )}
+          </div>
+          {edgeList?.length > 0 && (
+            <div style={{ flex: "1 1 40%", minWidth: 200 }}>
+              <h3 style={{ marginTop: 8 }}>Chemin demandé</h3>
+              <ul className="hint">
+                {edgeList.map((e, i) => (
+                  <li key={i}>
+                    {e.source} → {e.target} : <b>{e.weight}</b>
+                  </li>
+                ))}
+              </ul>
+              <p className="hint" style={{ fontWeight: 700 }}>
+                Total : {edgeList.reduce((sum, e) => sum + (Number(e.weight) || 0), 0)}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     );
   }
