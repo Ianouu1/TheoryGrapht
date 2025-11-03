@@ -4,7 +4,7 @@ import baseGraph from "../assets/baseGraph.json";
 import bellmanFordGraph from "../assets/bellmanFordGraph.json";
 import floydWarshallGraph from "../assets/floydWarshallGraph.json";
 
-// Conversion pour graphes non dirigés (bidirectionnels)
+// Conversion non orientée (bidirectionnelle)
 function adjacencyToNodesLinksUndirected(
     graph: Record<string, { target: string; distance: number }[]>
 ) {
@@ -21,7 +21,7 @@ function adjacencyToNodesLinksUndirected(
             if (!neighbor || !neighbor.target) continue;
 
             const { target, distance } = neighbor;
-            // Pour les graphes non dirigés, on utilise une clé symétrique
+            // Clé symétrique pour éviter les doublons
             const key = [from, target].sort().join("_");
 
             if (!added.has(key)) {
@@ -37,7 +37,7 @@ function adjacencyToNodesLinksUndirected(
     return { nodes, links };
 }
 
-// Conversion pour graphes dirigés (unidirectionnels)
+// Conversion orientée (unidirectionnelle)
 function adjacencyToNodesLinksDirected(
     graph: Record<string, { target: string; distance: number }[]>
 ) {
@@ -54,7 +54,7 @@ function adjacencyToNodesLinksDirected(
             if (!neighbor || !neighbor.target) continue;
 
             const { target, distance } = neighbor;
-            // Pour les graphes dirigés, on utilise une clé directionnelle
+            // Clé directionnelle stricte
             const key = `${from}_${target}`;
 
             if (!added.has(key)) {
@@ -90,7 +90,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
     setEndNode,
 }) => {
 
-    // Sélection d'un algorithme et chargement du graph approprié
+    // Choix de l'algo et chargement du graphe associé
     function handleAlgoClick(algo: string) {
         try {
             setSelectedAlgo(algo);

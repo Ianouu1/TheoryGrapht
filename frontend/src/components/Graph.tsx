@@ -29,7 +29,7 @@ const Graph: React.FC<GraphProps> = ({ nodes, links, highlightEdges }) => {
 
     useEffect(() => {
         if (!svgRef.current) return;
-        if (!nodes || nodes.length === 0) return; // Protection contre les nodes vides
+    if (!nodes || nodes.length === 0) return;
 
         try {
             const width = svgRef.current.clientWidth || 800;
@@ -48,14 +48,14 @@ const Graph: React.FC<GraphProps> = ({ nodes, links, highlightEdges }) => {
             const labelLayer = gZoom.append("g");
             const nodeLayer = gZoom.append("g");
 
-            // --- Zoom/Pan ---
+            // Zoom / Pan
             const zoom = d3
                 .zoom<SVGSVGElement, unknown>()
                 .scaleExtent([0.5, 3])
                 .on("zoom", (event) => gZoom.attr("transform", event.transform));
             svg.call(zoom);
 
-            // --- Positionnement initial circulaire centré ---
+            // Placement initial circulaire
             const centerX = width / 2;
             const centerY = height / 2;
             const radius = Math.min(width, height) / 2.5;
@@ -66,7 +66,7 @@ const Graph: React.FC<GraphProps> = ({ nodes, links, highlightEdges }) => {
                 n.y = centerY + radius * Math.sin(angle);
             });
 
-            // --- Simulation ---
+            // Simulation
             const sim = d3
                 .forceSimulation<GraphNode>(nodes)
                 .force(
@@ -145,7 +145,6 @@ const Graph: React.FC<GraphProps> = ({ nodes, links, highlightEdges }) => {
                     const sy = (d.source as GraphNode).y || 0;
                     const tx = (d.target as GraphNode).x || 0;
                     const ty = (d.target as GraphNode).y || 0;
-                    // Undirected: toujours une ligne droite
                     return `M${sx},${sy} L${tx},${ty}`;
                 });
 
@@ -179,7 +178,7 @@ const Graph: React.FC<GraphProps> = ({ nodes, links, highlightEdges }) => {
         }
     }, [nodes, links]);
 
-    // --- Met à jour uniquement les couleurs sans tout redessiner ---
+    // Met à jour uniquement les couleurs
     useEffect(() => {
         if (!svgRef.current) return;
         

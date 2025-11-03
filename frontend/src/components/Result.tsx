@@ -16,7 +16,7 @@ type ResultProps = {
 // tree helpers moved to TreeDiagram component
 
 export default function Result({ edgeList, bfTable, fwMatrices, algo, startNode }: ResultProps) {
-  // If Floyd–Warshall matrices present, render them first (distance + next)
+  // Si matrices FW présentes, on affiche d'abord distances + pères
   if (fwMatrices) {
     const verts = (fwMatrices.vertices && fwMatrices.vertices.length > 0)
       ? fwMatrices.vertices
@@ -73,7 +73,7 @@ export default function Result({ edgeList, bfTable, fwMatrices, algo, startNode 
           </tbody>
         </table>
 
-        {/* Edge list (optional) still shown below if any */}
+  {/* On peut aussi afficher le chemin demandé en-dessous */}
         {edgeList?.length > 0 && (
           <>
             <hr style={{ border: "none", borderTop: "1px solid var(--border)", margin: "8px 0" }} />
@@ -93,14 +93,14 @@ export default function Result({ edgeList, bfTable, fwMatrices, algo, startNode 
       </div>
     );
   }
-  // If Bellman-Ford table is present, render the table
+  // Sinon, si on a la table BF
   if (bfTable && bfTable.length > 0) {
     const vertices = Object.keys(bfTable[0].states);
     const first = bfTable[0];
     const last = bfTable[bfTable.length - 1];
     const startName = first.choiceName ?? vertices[0];
 
-    // Build shortest paths from the final row by following predecessors
+  // Reconstruit les plus courts chemins à partir de la dernière ligne
     const parseCell = (val?: string): { dist: number | null; pred: string | null } => {
       if (!val) return { dist: null, pred: null };
       const m = val.match(/^\((.*?),\s*(.*?)\)$/);
@@ -119,7 +119,7 @@ export default function Result({ edgeList, bfTable, fwMatrices, algo, startNode 
         if (dist === null) return { to: v, cost: null, seq: [] };
         const seq: string[] = [v];
         let curPred = pred;
-        // Backtrack using predecessors until start or null
+  // On remonte via les prédécesseurs jusqu'à la source
         let guard = 0;
         while (curPred && curPred !== startName && guard < 1000) {
           seq.push(curPred);
@@ -191,7 +191,7 @@ export default function Result({ edgeList, bfTable, fwMatrices, algo, startNode 
     );
   }
 
-  // Default: render the edge list result; if BFS/DFS, also show a simple tree
+  // Par défaut: on liste les arêtes; pour BFS/DFS on ajoute le petit arbre
   return (
     <div className="card">
       <h2>Résultat {edgeList.length > 0 && `(${edgeList.length} arêtes)`}</h2>

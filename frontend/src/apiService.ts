@@ -3,6 +3,19 @@ import type {GraphNode, GraphLink} from "./components/Graph";
 
 const BASE_URL = "http://localhost:8080";
 
+async function fetchJson<T>(url: string, body: unknown): Promise<T> {
+    const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(text || `Requête échouée (${res.status})`);
+    }
+    return res.json() as Promise<T>;
+}
+
 export type Neighbor = { target: string; distance: number };
 export type AdjacencyGraph = Record<string, Neighbor[]>;
 export type BFStep = {
@@ -15,10 +28,10 @@ export type BFStep = {
 export type FloydMatrices = {
     dist: Record<string, Record<string, number>>;
     next: Record<string, Record<string, string | null>>;
-    vertices?: string[]; // server-provided stable order
+    vertices?: string[]; // ordre des sommets renvoyé par le serveur
 };
 
-// Convertit nodes/links → format attendu par ton backend
+// Construit l'adjacence au format attendu par l'API
 export function graphToAdjacency(nodes: GraphNode[], links: GraphLink[], directed = false): AdjacencyGraph {
     const adj: AdjacencyGraph = {};
     nodes.forEach(n => (adj[n.id] = []));
@@ -26,7 +39,7 @@ export function graphToAdjacency(nodes: GraphNode[], links: GraphLink[], directe
         const s = typeof l.source === "object" ? l.source.id : l.source;
         const t = typeof l.target === "object" ? l.target.id : l.target;
         adj[s].push({target: t, distance: l.weight});
-        // Pour les graphes non dirigés, on ajoute aussi dans l'autre sens
+        // En non orienté: on ajoute aussi l'arête inverse
         if (!directed) {
             adj[t].push({target: s, distance: l.weight});
         }
@@ -36,82 +49,37 @@ export function graphToAdjacency(nodes: GraphNode[], links: GraphLink[], directe
 
 // ---- Appels API ---- //
 export async function runBFS(graph: AdjacencyGraph, start: string) {
-    const res = await fetch(`${BASE_URL}/bfs?startingVertexName=${start}`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(graph),
-    });
-    return res.json(); // tableau de Vertex
+    return fetchJson(`${BASE_URL}/bfs?startingVertexName=${start}`, graph);
 }
 
 export async function runDFS(graph: AdjacencyGraph, start: string) {
-    const res = await fetch(`${BASE_URL}/dfs?startingVertexName=${start}`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(graph),
-    });
-    return res.json();
+    return fetchJson(`${BASE_URL}/dfs?startingVertexName=${start}`, graph);
 }
 
 export async function runKruskal(graph: AdjacencyGraph) {
-    const res = await fetch(`${BASE_URL}/kruskal`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(graph),
-    });
-    return res.json(); // renvoie {edges: ...}
+    return fetchJson(`${BASE_URL}/kruskal`, graph);
 }
 
 export async function runPrim(graph: AdjacencyGraph, start: string) {
-    const res = await fetch(`${BASE_URL}/prim?startingVertexName=${start}`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(graph),
-    });
-    return res.json();
+    return fetchJson(`${BASE_URL}/prim?startingVertexName=${start}`, graph);
 }
 
 export async function runDijkstra(graph: AdjacencyGraph, start: string, end: string) {
-    const res = await fetch(`${BASE_URL}/dijkstra?start=${start}&end=${end}`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(graph),
-    });
-    return res.json();
+    return fetchJson(`${BASE_URL}/dijkstra?start=${start}&end=${end}`, graph);
 }
 
 export async function runFloydWarshall(graph: AdjacencyGraph, start: string, end: string) {
-    const response = await fetch(`${BASE_URL}/floydWarshall?start=${start}&end=${end}`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(graph),
-    });
-    return response.json();
+    return fetchJson(`${BASE_URL}/floydWarshall?start=${start}&end=${end}`, graph);
 }
 
 export async function runBellmanFord(graph: AdjacencyGraph, start: string) {
-    const res = await fetch(`${BASE_URL}/bellmanFord?start=${start}`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(graph),
-    });
-    return res.json();
+    return fetchJson(`${BASE_URL}/bellmanFord?start=${start}`, graph);
 }
 
 export async function runBellmanFordTable(graph: AdjacencyGraph, start: string): Promise<BFStep[]> {
-    const res = await fetch(`${BASE_URL}/bellmanFord/table?start=${start}`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(graph),
-    });
-    return res.json();
+    return fetchJson(`${BASE_URL}/bellmanFord/table?start=${start}`, graph);
 }
 
 export async function runFloydWarshallMatrices(graph: AdjacencyGraph): Promise<FloydMatrices> {
-    const response = await fetch(`${BASE_URL}/floydWarshall/matrices`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(graph),
-    });
-    return response.json();
+    return fetchJson(`${BASE_URL}/floydWarshall/matrices`, graph);
 }

@@ -18,7 +18,7 @@ import {
     type FloydMatrices,
 } from "./apiService";
 import Toolbar from "./components/Toolbar";
-import VertexLauncher from "./components/VertexLauncher.tsx";
+import VertexLauncher from "./components/VertexLauncher";
 import Result from "./components/Result";
 import GraphJsonEditor from "./components/GraphJsonEditor";
 import "./App.css";
@@ -41,7 +41,7 @@ const App: React.FC = () => {
     const [startNode, setStartNode] = useState("");
     const [endNode, setEndNode] = useState("");
 
-    // Initialiser avec baseGraph au chargement
+    // Chargement initial à partir du graphe de base
     useEffect(() => {
         const nodes: GraphNode[] = Object.keys(baseGraph).map((id) => ({id}));
         const nodeMap = Object.fromEntries(nodes.map((n) => [n.id, n]));
@@ -66,7 +66,6 @@ const App: React.FC = () => {
         setLinks(links);
     }, []);
 
-    // If user switches away from Bellman-Ford, clear any previous BF table
     useEffect(() => {
         if (selectedAlgo !== "bellmanford" && bfTable) {
             setBfTable(null);
@@ -77,7 +76,6 @@ const App: React.FC = () => {
     }, [selectedAlgo]);
 
     async function handleSendGraph(algorithm: string, start?: string, end?: string) {
-        // If we're not running Bellman-Ford, ensure any previous BF table is cleared
         if (algorithm !== "bellmanford") {
             setBfTable(null);
         }
@@ -119,18 +117,18 @@ const App: React.FC = () => {
                     break;
                 case "bellmanford":
                     if (!start) return alert("Choisis un sommet de départ");
-                    // For BF, fetch BOTH: edges for visualization and table for the side panel
+                    // BF: on récupère à la fois les arêtes et la table
                     const [bfEdges, bfSteps] = await Promise.all([
                         runBellmanFord(adj, start),
                         runBellmanFordTable(adj, start),
                     ]);
 
-                    // Update table
+                    // Table à droite
                     setBfTable(bfSteps as BFStep[]);
 
-                    // Clear previous visuals and do the edge highlight animation
+                    // Animation des arêtes
                     setHighlightEdges({});
-                    setEdgeList([]); // we don't display an edge list for BF
+                    setEdgeList([]);
 
                     await new Promise((resolve) => setTimeout(resolve, 100));
 
@@ -153,7 +151,6 @@ const App: React.FC = () => {
             }
 
             if (result && Array.isArray(result)) {
-                // Clear any BF table when algorithms return edges
                 setBfTable(null);
                 setHighlightEdges({});
                 setEdgeList([]);
@@ -174,8 +171,7 @@ const App: React.FC = () => {
                     const s = e.source.name || e.source;
                     const t = e.target.name || e.target;
                     setTimeout(() => {
-                        // Toujours poser les deux sens; chaque composant (orienté vs non orienté)
-                        // décide de l'interprétation à l'affichage.
+                        // On pose les deux sens; chaque composant gère l'affichage.
                         newColors[`${s}_${t}`] = "#ef1e1e";
                         newColors[`${t}_${s}`] = "#ef1e1e";
                         setHighlightEdges((prev) => ({...prev, ...newColors}));
@@ -193,11 +189,9 @@ const App: React.FC = () => {
         setBfTable(null);
     }
 
-    // Reload graph from edited JSON (already converted to nodes/links by child)
     function handleReloadGraph(newNodes: GraphNode[], newLinks: GraphLink[]) {
         setNodes(newNodes);
         setLinks(newLinks);
-        // Clear any ongoing highlights/results when reloading graph
         resetState();
     }
 

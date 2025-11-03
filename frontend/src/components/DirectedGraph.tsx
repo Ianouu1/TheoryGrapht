@@ -8,7 +8,7 @@ type DirectedGraphProps = {
     highlightEdges?: Record<string, string>;
 };
 
-// Composant indépendant pour l'affichage des graphes orientés (flèches, courbes pour arêtes inverses)
+// Graphe orienté (flèches, courbes si arêtes inverses)
 const DirectedGraph: React.FC<DirectedGraphProps> = ({ nodes, links, highlightEdges }) => {
     const svgRef = useRef<SVGSVGElement>(null);
     const simRef = useRef<d3.Simulation<GraphNode, GraphLink> | null>(null);
@@ -30,7 +30,7 @@ const DirectedGraph: React.FC<DirectedGraphProps> = ({ nodes, links, highlightEd
             const labelLayer = gZoom.append("g");
             const nodeLayer = gZoom.append("g");
 
-            // Flèches pour arêtes orientées
+            // Définition des flèches
             svg.append("defs")
                 .append("marker")
                 .attr("id", "arrowhead")
@@ -51,7 +51,7 @@ const DirectedGraph: React.FC<DirectedGraphProps> = ({ nodes, links, highlightEd
                 .on("zoom", (event) => gZoom.attr("transform", event.transform));
             svg.call(zoom);
 
-            // Placement initial circulaire
+            // Placement initial
             const centerX = width / 2;
             const centerY = height / 2;
             const radius = Math.min(width, height) / 2.5;
@@ -233,7 +233,7 @@ const DirectedGraph: React.FC<DirectedGraphProps> = ({ nodes, links, highlightEd
         }
     }, [nodes, links]);
 
-    // Mise à jour des couleurs (directionnelles uniquement)
+    // Mise à jour des couleurs
     useEffect(() => {
         if (!svgRef.current) return;
         try {

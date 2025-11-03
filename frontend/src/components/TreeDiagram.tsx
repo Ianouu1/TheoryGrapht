@@ -40,7 +40,7 @@ function buildTree(edges: EdgeRow[], root?: string): TreeNode | null {
   };
 
   const rootNode = toNode(rootName);
-  // Do not attach synthetic root; assume graph is connected as per requirement
+  // Pas de racine synthétique, on suppose le graphe connexe
   return rootNode;
 }
 

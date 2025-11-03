@@ -9,7 +9,7 @@ type Props = {
     onReloadGraph: (nodes: GraphNode[], links: GraphLink[]) => void;
 };
 
-// Build adjacency object from current nodes/links
+// Construit l'adjacence à partir des nodes/links
 function nodesLinksToAdjacency(
     nodes: GraphNode[],
     links: GraphLink[],
@@ -24,14 +24,14 @@ function nodesLinksToAdjacency(
         const w = l.weight ?? 0;
         adj[s].push({target: t, distance: w});
         if (!directed) {
-            // For undirected view, include the reverse for readability/editing
+            // En non orienté, on ajoute l'arête inverse pour la lecture/édition
             adj[t].push({target: s, distance: w});
         }
     });
     return adj;
 }
 
-// Conversions from adjacency JSON back to nodes/links
+// Conversion du JSON vers nodes/links
 function adjacencyToNodesLinksUndirected(
     graph: Record<string, { target: string; distance: number }[]>
 ): { nodes: GraphNode[]; links: GraphLink[] } {
@@ -90,7 +90,6 @@ const GraphJsonEditor: React.FC<Props> = ({nodes, links, directed, onReloadGraph
             const parsed = JSON.parse(text);
             if (!parsed || typeof parsed !== "object") throw new Error("JSON invalide");
 
-            // Ensure all nodes appear as keys
             const graph: Record<string, { target: string; distance: number }[]> = parsed;
             const converter = directed ? adjacencyToNodesLinksDirected : adjacencyToNodesLinksUndirected;
             const {nodes: newNodes, links: newLinks} = converter(graph);
@@ -117,7 +116,7 @@ const GraphJsonEditor: React.FC<Props> = ({nodes, links, directed, onReloadGraph
             />
             {error && <div className="json-editor-error">{error}</div>}
             <div className="json-editor-actions">
-                <button onClick={handleReload}>Reload</button>
+                <button onClick={handleReload}>Recharger</button>
             </div>
             <div className="json-editor-note hint" style={{marginTop: 6}}>
                 {!directed ? (
@@ -126,10 +125,9 @@ const GraphJsonEditor: React.FC<Props> = ({nodes, links, directed, onReloadGraph
                     </>
                 ) : (
                     <>
-                        <b>Mode non orienté :</b> les arêtes sont considérées comme dirigées.
+                        <b>Mode orienté :</b> les arêtes sont considérées comme dirigées.
                     </>
-                )
-                }
+                )}
             </div>
         </section>
     );
