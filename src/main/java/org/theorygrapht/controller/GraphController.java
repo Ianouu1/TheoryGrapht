@@ -16,6 +16,8 @@ import org.theorygrapht.model.BelmanFordTableLine;
 import static org.theorygrapht.service.DFS.getDFS;
 import static org.theorygrapht.service.Dijkstra.getDijkstra;
 import static org.theorygrapht.service.FloydWarshall.getFloydWarshall;
+import static org.theorygrapht.service.FloydWarshall.getMatrices;
+import org.theorygrapht.service.FloydWarshall.FloydResult;
 import static org.theorygrapht.service.Kruskal.getKruskal;
 import static org.theorygrapht.service.Prim.getPrim;
 
@@ -69,6 +71,12 @@ public class GraphController {
                                     @RequestParam String end) {
         Graph graph = GraphUtils.fromMap(graphJson);
         return getFloydWarshall(graph, start, end);
+    }
+
+    @PostMapping("/floydWarshall/matrices")
+    public FloydResult floydWarshallMatrices(@RequestBody Map<String, List<GraphInput.Neighbor>> graphJson) {
+        Graph graph = GraphUtils.fromMap(graphJson);
+        return getMatrices(graph);
     }
 
     @PostMapping("/bellmanFord")

@@ -1,4 +1,4 @@
-import type { BFStep } from "../apiService";
+import type { BFStep, FloydMatrices } from "../apiService";
 import TreeDiagram from "./TreeDiagram";
 
 export type EdgeRow = { source: string; target: string; weight: number };
@@ -6,6 +6,7 @@ export type EdgeRow = { source: string; target: string; weight: number };
 type ResultProps = {
   edgeList: EdgeRow[];
   bfTable?: BFStep[] | null;
+  fwMatrices?: FloydMatrices | null;
   algo?: string; // to detect BFS/DFS
   startNode?: string; // root for BFS/DFS tree
 };
@@ -14,7 +15,84 @@ type ResultProps = {
 
 // tree helpers moved to TreeDiagram component
 
-export default function Result({ edgeList, bfTable, algo, startNode }: ResultProps) {
+export default function Result({ edgeList, bfTable, fwMatrices, algo, startNode }: ResultProps) {
+  // If Floyd–Warshall matrices present, render them first (distance + next)
+  if (fwMatrices) {
+    const verts = (fwMatrices.vertices && fwMatrices.vertices.length > 0)
+      ? fwMatrices.vertices
+      : Object.keys(fwMatrices.dist || {});
+    const isInf = (v: number) => v === 2147483647 || v === Number.POSITIVE_INFINITY as any;
+    return (
+      <div className="card">
+        <h2>Floyd–Warshall</h2>
+        <h3 style={{ marginTop: 8 }}>Matrice des distances</h3>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+          <tr>
+            <th style={{ textAlign: "left", padding: 6 }}></th>
+            {verts.map((v) => (
+              <th key={`d-h-${v}`} style={{ textAlign: "center", padding: 6 }}>{v}</th>
+            ))}
+          </tr>
+          </thead>
+          <tbody>
+          {verts.map((i) => (
+            <tr key={`d-r-${i}`}>
+              <th style={{ textAlign: "left", padding: 6 }}>{i}</th>
+              {verts.map((j) => {
+                const val = fwMatrices.dist?.[i]?.[j];
+                const text = val == null ? "–" : (isInf(val) ? "∞" : String(val));
+                return <td key={`d-c-${i}-${j}`} style={{ textAlign: "center", padding: 6, borderBottom: "1px solid var(--border)" }}>{text}</td>;
+              })}
+            </tr>
+          ))}
+          </tbody>
+        </table>
+
+        <h3 style={{ marginTop: 12 }}>Matrice des pères</h3>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+          <tr>
+            <th style={{ textAlign: "left", padding: 6 }}></th>
+            {verts.map((v) => (
+              <th key={`n-h-${v}`} style={{ textAlign: "center", padding: 6 }}>{v}</th>
+            ))}
+          </tr>
+          </thead>
+          <tbody>
+          {verts.map((i) => (
+            <tr key={`n-r-${i}`}>
+              <th style={{ textAlign: "left", padding: 6 }}>{i}</th>
+              {verts.map((j) => {
+                const val = fwMatrices.next?.[i]?.[j];
+                const text = val == null ? "–" : String(val);
+                return <td key={`n-c-${i}-${j}`} style={{ textAlign: "center", padding: 6, borderBottom: "1px solid var(--border)" }}>{text}</td>;
+              })}
+            </tr>
+          ))}
+          </tbody>
+        </table>
+
+        {/* Edge list (optional) still shown below if any */}
+        {edgeList?.length > 0 && (
+          <>
+            <hr style={{ border: "none", borderTop: "1px solid var(--border)", margin: "8px 0" }} />
+            <h3 style={{ marginTop: 8 }}>Chemin demandé</h3>
+            <ul className="hint">
+              {edgeList.map((e, i) => (
+                <li key={i}>
+                  {e.source} → {e.target} : <b>{e.weight}</b>
+                </li>
+              ))}
+            </ul>
+            <p className="hint" style={{ fontWeight: 700 }}>
+              Total : {edgeList.reduce((sum, e) => sum + (Number(e.weight) || 0), 0)}
+            </p>
+          </>
+        )}
+      </div>
+    );
+  }
   // If Bellman-Ford table is present, render the table
   if (bfTable && bfTable.length > 0) {
     const vertices = Object.keys(bfTable[0].states);

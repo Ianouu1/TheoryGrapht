@@ -11,9 +11,11 @@ import {
     runBFS,
     runDijkstra,
     runFloydWarshall,
+    runFloydWarshallMatrices,
     runBellmanFord,
     runBellmanFordTable,
     type BFStep,
+    type FloydMatrices,
 } from "./apiService";
 import Toolbar from "./components/Toolbar";
 import VertexLauncher from "./components/VertexLauncher.tsx";
@@ -33,6 +35,7 @@ const App: React.FC = () => {
         { source: string; target: string; weight: number }[]
     >([]);
     const [bfTable, setBfTable] = useState<BFStep[] | null>(null);
+    const [fwMatrices, setFwMatrices] = useState<FloydMatrices | null>(null);
     const [directed, setDirected] = useState(false);
     const [selectedAlgo, setSelectedAlgo] = useState<string | null>(null);
     const [startNode, setStartNode] = useState("");
@@ -68,12 +71,18 @@ const App: React.FC = () => {
         if (selectedAlgo !== "bellmanford" && bfTable) {
             setBfTable(null);
         }
+        if (selectedAlgo !== "floydwarshall" && fwMatrices) {
+            setFwMatrices(null);
+        }
     }, [selectedAlgo]);
 
     async function handleSendGraph(algorithm: string, start?: string, end?: string) {
         // If we're not running Bellman-Ford, ensure any previous BF table is cleared
         if (algorithm !== "bellmanford") {
             setBfTable(null);
+        }
+        if (algorithm !== "floydwarshall") {
+            setFwMatrices(null);
         }
         const adj = graphToAdjacency(nodes, links, directed);
         let result: any;
@@ -101,7 +110,12 @@ const App: React.FC = () => {
                     break;
                 case "floydwarshall":
                     if (!start || !end) return alert("Choisis deux sommets");
-                    result = await runFloydWarshall(adj, start, end);
+                    const [fwPath, matrices] = await Promise.all([
+                        runFloydWarshall(adj, start, end),
+                        runFloydWarshallMatrices(adj),
+                    ]);
+                    setFwMatrices(matrices);
+                    result = fwPath;
                     break;
                 case "bellmanford":
                     if (!start) return alert("Choisis un sommet de départ");
@@ -261,7 +275,7 @@ const App: React.FC = () => {
                         onCancel={handleCancel}
                     />
 
-                    <Result edgeList={edgeList} bfTable={bfTable} algo={selectedAlgo ?? ""} startNode={startNode} />
+                    <Result edgeList={edgeList} bfTable={bfTable} fwMatrices={fwMatrices} algo={selectedAlgo ?? ""} startNode={startNode} />
                 </aside>
             </main>
         </div>

@@ -8,72 +8,74 @@ import java.util.*;
 
 public class FloydWarshall {
 
-    private static class FloydResult {
-        Map<String, Map<String, Integer>> dist;
-        Map<String, Map<String, String>> next;
+    public static class FloydResult {
+        public final Map<String, Map<String, Integer>> dist;
+        public final Map<String, Map<String, String>> next;
+        public final List<String> vertices;
 
-        FloydResult(Map<String, Map<String, Integer>> dist, Map<String, Map<String, String>> next) {
+        public FloydResult(Map<String, Map<String, Integer>> dist,
+                           Map<String, Map<String, String>> next,
+                           List<String> vertices) {
             this.dist = dist;
             this.next = next;
+            this.vertices = vertices;
         }
     }
 
-    private static FloydResult compute(Graph graph) {
+    public static FloydResult getMatrices(Graph graph) {
         Vertex[] vertices = graph.getVertices();
         Edge[] edges = graph.getEdges();
 
-        Map<String, Map<String, Integer>> dist = new HashMap<>();
-        Map<String, Map<String, String>> next = new HashMap<>();
+        // Vertex order
+        List<String> order = new ArrayList<>();
+        for (Vertex v : vertices) order.add(v.getName());
 
-        // Initialize matrices
-        for (Vertex u : vertices) {
-            Map<String, Integer> distRow = new HashMap<>();
-            Map<String, String> nextRow = new HashMap<>();
-            for (Vertex v : vertices) {
-                distRow.put(v.getName(), u.equals(v) ? 0 : Integer.MAX_VALUE);
-                nextRow.put(v.getName(), null);
+        Map<String, Map<String, Integer>> dist = new LinkedHashMap<>();
+        Map<String, Map<String, String>> next = new LinkedHashMap<>();
+
+        // Init matrices
+        for (String u : order) {
+            Map<String, Integer> distRow = new LinkedHashMap<>();
+            Map<String, String> nextRow = new LinkedHashMap<>();
+            for (String v : order) {
+                distRow.put(v, u.equals(v) ? 0 : Integer.MAX_VALUE);
+                nextRow.put(v, null);
             }
-            dist.put(u.getName(), distRow);
-            next.put(u.getName(), nextRow);
+            dist.put(u, distRow);
+            next.put(u, nextRow);
         }
 
-        // Initialize edges (undirected)
         for (Edge e : edges) {
             String u = e.getSource().getName();
             String v = e.getTarget().getName();
             int w = e.getWeight();
             dist.get(u).put(v, w);
-            dist.get(v).put(u, w);
             next.get(u).put(v, v);
-            next.get(v).put(u, u);
         }
 
-        // Core algorithm
-        for (Vertex k : vertices) {
-            for (Vertex i : vertices) {
-                for (Vertex j : vertices) {
-                    int distIK = dist.get(i.getName()).get(k.getName());
-                    int distKJ = dist.get(k.getName()).get(j.getName());
-                    int distIJ = dist.get(i.getName()).get(j.getName());
+        // Core FW
+        for (String k : order) {
+            for (String i : order) {
+                for (String j : order) {
+                    int dik = dist.get(i).get(k);
+                    int dkj = dist.get(k).get(j);
+                    int dij = dist.get(i).get(j);
 
-                    if (distIK != Integer.MAX_VALUE && distKJ != Integer.MAX_VALUE &&
-                            distIK + distKJ < distIJ) {
-                        dist.get(i.getName()).put(j.getName(), distIK + distKJ);
-                        next.get(i.getName()).put(j.getName(), next.get(i.getName()).get(k.getName()));
+                    if (dik != Integer.MAX_VALUE && dkj != Integer.MAX_VALUE &&
+                            dik + dkj < dij) {
+                        dist.get(i).put(j, dik + dkj);
+                        next.get(i).put(j, next.get(i).get(k));
                     }
                 }
             }
         }
 
-        return new FloydResult(dist, next);
+        return new FloydResult(dist, next, order);
     }
 
-    public static Map<String, Map<String, Integer>> getDistanceMatrix(Graph graph) {
-        return compute(graph).dist;
-    }
 
     public static List<Edge> getFloydWarshall(Graph graph, String startName, String endName) {
-        FloydResult result = compute(graph);
+        FloydResult result = getMatrices(graph);
         Map<String, Map<String, String>> next = result.next;
         Edge[] edges = graph.getEdges();
 
@@ -83,17 +85,17 @@ public class FloydWarshall {
         String current = startName;
 
         while (!current.equals(endName)) {
-            String nextVertex = next.get(current).get(endName);
-            if (nextVertex == null) break;
+            String nxt = next.get(current).get(endName);
+            if (nxt == null) break;
 
             for (Edge e : edges) {
-                if ((e.getSource().getName().equals(current) && e.getTarget().getName().equals(nextVertex)) ||
-                        (e.getSource().getName().equals(nextVertex) && e.getTarget().getName().equals(current))) {
+                if (e.getSource().getName().equals(current) && e.getTarget().getName().equals(nxt)) {
                     pathEdges.add(e);
                     break;
                 }
             }
-            current = nextVertex;
+
+            current = nxt;
         }
 
         return pathEdges;

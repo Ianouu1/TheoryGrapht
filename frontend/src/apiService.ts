@@ -12,6 +12,12 @@ export type BFStep = {
     choiceDistance?: number | null; // distance du choix
 };
 
+export type FloydMatrices = {
+    dist: Record<string, Record<string, number>>;
+    next: Record<string, Record<string, string | null>>;
+    vertices?: string[]; // server-provided stable order
+};
+
 // Convertit nodes/links → format attendu par ton backend
 export function graphToAdjacency(nodes: GraphNode[], links: GraphLink[], directed = false): AdjacencyGraph {
     const adj: AdjacencyGraph = {};
@@ -99,4 +105,13 @@ export async function runBellmanFordTable(graph: AdjacencyGraph, start: string):
         body: JSON.stringify(graph),
     });
     return res.json();
+}
+
+export async function runFloydWarshallMatrices(graph: AdjacencyGraph): Promise<FloydMatrices> {
+    const response = await fetch(`${BASE_URL}/floydWarshall/matrices`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(graph),
+    });
+    return response.json();
 }
