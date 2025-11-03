@@ -4,7 +4,9 @@ Auteurs : Yannis BOUTALEB - Florian DE SOUSA
 
 ## 🎯 Contexte et objectifs
 
-**TheoryGrapht** est une application web permettant de visualiser les algorithmes de graphes étudiés en cours. Elle implémente les algorithmes suivants :
+**TheoryGrapht** est une application web permettant de visualiser les algorithmes de graphes étudiés en cours. Elle
+implémente les algorithmes suivants :
+
 - Parcours en largeur (BFS)
 - Parcours en profondeur (DFS)
 - Dijkstra
@@ -15,195 +17,348 @@ Auteurs : Yannis BOUTALEB - Florian DE SOUSA
 ## 🧩 Technologies utilisées & Architecture du projet
 
 Pour ce projet, nous avons choisi de le réaliser en utilisant les technologies suivantes :
-- **Java 17** : pour le développement back-end, car il s'agit du langage qu'on maîtrise le mieux.
-- **Spring Boot** : pour créer une API RESTful. 
-- **Maven** : pour la gestion des dépendances et la construction du projet.
-- **Vite + React** : pour le développement front-end, permettant une interface utilisateur réactive et moderne.
+
+### Back-end
+
+- **Java 17** : pour le développement back-end, car il s'agit du langage qu'on maîtrise le mieux
+- **Spring Boot** / **Swagger**: pour exposer une API REST permettant de communiquer avec le front-end
+- **Maven** : pour la gestion des dépendances et la construction du projet
+
+### Front-end
+
+- **Vite** / **React** : Pour le front-end de l'application web
+- **Node.js** : pour gérer les dépendances front-end et lancer le serveur front-end
+- **d3.js** : pour la visualisation dynamique des graphes et des résultats des algorithmes
 
 ### Architecture back-end
 
-L’architecture **back-end** adoptée pour ce projet suit une organisation modulaire afin de séparer clairement les responsabilités. Nous retrouvons ainsi les couches suivantes : 
+L’architecture **back-end** adoptée pour ce projet suit une organisation modulaire afin de séparer clairement les
+responsabilités. Nous retrouvons ainsi les couches suivantes :
 
-#### 1. Controlleur REST
+* Contrôleur
+* Modèle
+* Service
+* Utilitaires
 
-Cette couche expose les endpoints d'une API, recevant les requêtes HTTP du frontend et renvoyant les réponses appropriées. Chaque endpoint correspond à un algorithme spécifique. 
+Cette structure favorise la lisibilité, la maintenabilité et l’évolutivité du code en isolant la logique métier, les
+modèles de données et les points d’entrée de l’API.
 
+#### 1. Contrôleur
+
+Cette couche expose les endpoints de l'API que nous avons créé pour le projet. Elle reçoit des requêtes HTTP du frontend
+et renvoie les réponses appropriées pour être interprétées visuellement.
+
+#### 2. Modèle
+
+Cette couche regroupe les structures de données principales utilisées dans l'application. Particulièrement celle
+représentant le graphe, les sommets et les arêtes.
+
+```java
+public class Vertex {
+    private String name;
+}
 ```
-org.theorygrapht
-├── controller       → contient les classes REST exposant les routes de l’API
-├── model            → regroupe les structures de données principales (Graph, Node, Edge)
-├── service          → implémente les algorithmes de graphes (BFS, DFS, Dijkstra, Kruskal, etc.)
-└── util             → fournit des outils complémentaires (chargement JSON, fonctions utilitaires, etc.)
-```
-Cette structure favorise la lisibilité, la maintenabilité et l’évolutivité du code en isolant la logique métier, les modèles de données et les points d’entrée de l’API.
 
-## 2\. Théorie des algorithmes
+```java
+public class Edge {
+    private Vertex source;
+    private Vertex target;
+    private int weight;
+}
+```
+
+```java
+public class Graph {
+    private Vertex[] vertices;
+    private Edge[] edges;
+    private Map<Vertex, List<Edge>> adjacencyList;
+}
+```
+
+Elle contient également d'autres classes pour faciliter la manipulation des graphes et des résultats des algorithmes.
+
+#### 3. Service
+
+Cette couche implémente les algorithmes de graphes étudiés (BFS, DFS, Dijkstra, Kruskal, Prim, Floyd-Warshall). Certains
+algorithmes ont des méthodes supplémentaires afin d'afficher plus de détails sur leur exécution (matrices, tableaux,
+etc.)
+
+#### 4. Utilitaires
+
+Cette couche met à disposition des outils complémentaires pour le projet, tels que le chargement JSON et des fonctions
+utilitaires diverses.
+
+## 🚀 Dépendances & Déploiement du projet
+
+### Back-end
+
+Pour démarrer le projet, il est nécessaire d'installer les dépendances requises. A savoir :
+
+- Java 17
+- Maven
+- Node.js et npm
+
+Le projet utilise Maven pour la gestion des dépendances.
+Pour installer les dépendances, exécutez la commande suivante dans le répertoire du projet :
+
+```bash
+mvn clean install
+```
+
+Alternativement, vous pouvez utiliser l'interface graphique de IntelliJ IDEA pour installer les dépendances Maven :
+
+![mavenInstall.png](images/mavenInstall.png)
+
+Il faut aussi ensuite lancer la classe Main.java afin de démarrer le serveur Spring Boot.
+
+### Front-end
+
+Enfin, il faut installer les dépendances front-end en se plaçant dans le dossier "**frontend**" et en exécutant la
+commande
+suivante :
+
+```bash
+npm install
+```
+
+Maintenant, toujours dans le dossier "**frontend**", lancez le serveur de développement avec la commande :
+
+```bash
+npm run dev
+```
+
+Ainsi un Swagger est disponible à l'adresse http://localhost:8080/swagger-ui.html pour tester l'API. Vous pouvez
+consulter les routes mises à disposition ainsi que leur documentation.
+
+![Swagger.png](images/Swagger.png)
+
+Cette API met à disposition les endpoints des algorithmes implémentés dans le projet, en plus de quelques endpoints
+complémentaires pour avoir des résultats tel que des matrices ou tableaux.
+
+Le front-end de l'application est quant à lui accessible à l'adresse http://localhost:5173.
+
+## 📦 Structure des graphes en JSON
+
+La structure JSON des graphes **non-orientés** utilisée dans le projet veut qu'on déclare chaque arête dans les deux
+sens. Par exemple, le **graphe complet** suivant :
+
+```json
+{
+  "A": [
+    {
+      "target": "B",
+      "distance": 5
+    },
+    {
+      "target": "C",
+      "distance": 10
+    }
+  ],
+  "B": [
+    {
+      "target": "A",
+      "distance": 5
+    },
+    {
+      "target": "C",
+      "distance": 3
+    }
+  ],
+  "C": [
+    {
+      "target": "A",
+      "distance": 10
+    },
+    {
+      "target": "B",
+      "distance": 3
+    }
+  ]
+}
+```
+
+La structure JSON des graphes **orientés** utilisée dans le projet veut qu'on déclare chaque arc tel que le **graphe
+orienté** suivant :
+
+```json
+{
+  "A": [
+    {
+      "target": "B",
+      "distance": 5
+    },
+    {
+      "target": "C",
+      "distance": 10
+    }
+  ],
+  "B": [
+    {
+      "target": "C",
+      "distance": 3
+    }
+  ],
+  "C": []
+}
+```
+
+Pour faciliter le changement de graphes, nous avons implémenté un outil coté front-end pour importer des JSON de
+graphes.
+![JsonLoader.png](images/JsonLoader.png)
+
+## 🧠 Algorithmes implémentés
 
 Cette section présente le principe, la complexité et les cas d'usage de chaque algorithme.
 
-| Algorithme     | Complexité     | Cas d'usage                         | Structure clé |
-|----------------|----------------|-------------------------------------|---------------|
-| BFS            | O(V+E)         | Parcours, distances non pondérées   | Queue         |
-| DFS            | O(V+E)         | Détection de cycles, ordonnancement | Pile (stack)  |
-| Dijkstra       | O((V+E) log V) | Plus court chemin (poids ≥ 0)       | PriorityQueue |
-| Kruskal        | O(E log E)     | Arbre couvrant minimal              | Union-Find    |
-| Prim           | O(E log V)     | Arbre couvrant minimal              | PriorityQueue |
-| Floyd-Warshall | O(V^3)         | Tous les plus courts chemins        | Matrice       |
+| Algorithme       | Complexité     | Cas d'usage                                                             | Structure clé       |
+|------------------|----------------|-------------------------------------------------------------------------|---------------------|
+| BFS              | O(V+E)         | Parcours, distances non pondérées                                       | Queue               |
+| DFS              | O(V+E)         | Détection de cycles, ordonnancement                                     | Pile (stack)        |
+| Dijkstra         | O((V+E) log V) | Plus court chemin (poids ≥ 0)                                           | PriorityQueue       |
+| **Bellman-Ford** | **O(V·E)**     | Plus court chemin **avec poids négatifs**, détection de cycles négatifs | Tableau (distances) |
+| Kruskal          | O(E log E)     | Arbre couvrant minimal                                                  | Union-Find          |
+| Prim             | O(E log V)     | Arbre couvrant minimal                                                  | PriorityQueue       |
+| Floyd-Warshall   | O(V³)          | Tous les plus courts chemins                                            | Matrice             |
 
-## 3\. Implémentation et choix techniques
+### Parcours en largeur (BFS)
 
-L'application adopte une architecture en couches : (a) Frontend web (localhost:5173), (b) API Spring Boot (contrôleur REST), (c) couche Service (algorithmes), (d) couche Modèle (Graph, Vertex, Edge, GraphInput), (e) Utilitaires (conversion JSON ↔ modèle). L'API autorise explicitement les appels du front via CORS et expose les endpoints à la racine (sans préfixe /api).
+Principe : explore par couches depuis une source. Invariant : lorsqu'un sommet est extrait de la file, la distance
+calculée est minimale en nombre d'arêtes. Utilisations : distances non pondérées, composantes connexes, découverte de
+niveaux. Complexité : O(V+E).
 
-**Endpoints exposés** (POST : BFS, DFS, Dijkstra, Kruskal, Prim, Floyd-Warshall ; GET : /hello). Corps JSON : liste d'adjacence Map&lt;String, List<Neighbor&gt;>; Réponse : List&lt;Edge&gt;.
+Dans notre implémentation de l'algorithme, nous sélectionnons les sommets par ordre d'apparition dans le json et non par
+ordre alphabétique.
 
-![title](Images\Picture1.png)
+![BFS.png](images/BFS.png)
+Ici, on commence par la ville de départ, puis on explore ses voisins directs avant de passer aux voisins de ces
+derniers.
 
-### 3.1 Flux d'exécution (requête → résultat)
+### Parcours en profondeur (DFS)
 
-Front (<http://localhost:5173>)  
-└─ envoie JSON (liste d'adjacence) -> POST /dijkstra?start=...&end=...  
-└─ GraphController : reçoit Map&lt;String, List<Neighbor&gt;>  
-└─ GraphUtils.fromMap(...) : construit Graph (Vertex\[\], Edge\[\], adjacencyList symétrique)  
-└─ Service.getDijkstra(Graph, start, end) : calcule chemin (List&lt;Edge&gt;)  
-└─ Retour JSON (List&lt;Edge&gt;) -> Front (visualisation/path)
+Principe : exploration récursive/itérative en profondeur. Invariants : temps d'entrée/sortie utiles pour détection de
+cycles et topologie (DAG). Complexité : O(V+E).
 
-## 4\. Modèle de données et conventions
+De la même manière que pour BFS, on sélectionne les sommets par ordre d'apparition dans le json et non par ordre
+alphabétique.
 
-Le modèle manipulé par les services comporte : (i) Vertex (nom de ville), (ii) Edge (source, target, weight=int), (iii) Graph (tableaux de sommets/arêtes + liste d'adjacence), (iv) GraphInput.Neighbor (ville, distance) pour l'entrée JSON.
+![DFS.png](images/DFS.png)
+Ici, on commence par la ville de départ, puis on explore son premier descendant avant de passer aux descendants de ce
+dernier, et ainsi de suite.
 
-Conversion : GraphUtils crée les Vertex et Edge à partir de la map, et alimente la liste d'adjacence des deux côtés (source et target), ce qui équivaut à un graphe non orienté au niveau de la navigation. Points d'attention : dédoublonnage d'arêtes, boucles, cohérence des noms de villes.
+### Dijkstra (plus court chemin, poids ≥ 0)
 
-## 4\. Théorie détaillée des algorithmes
+Principe : relaxation itérative des arêtes avec sélection du sommet non traité le plus proche via une file de priorité.
 
-### 4.1 Parcours en largeur (BFS)
+Complexité : O((V+E) log V) avec tas binaire. Préconditions : poids non négatifs.
 
-Principe : explore par couches depuis une source. Invariant : lorsqu'un sommet est extrait de la file, la distance calculée est minimale en nombre d'arêtes. Utilisations : distances non pondérées, composantes connexes, découverte de niveaux. Complexité : O(V+E).
+![Djikstra.png](images/Djikstra.png)
+Ici, on choisit une ville, puis on explore le voisin de coût minimal en notant les voisins découverts, et on met à joue
+à chaque amélioration chaque voisin connu.
 
-Pseudo-code BFS(G, s):  
-pour v in V: dist\[v\] <- +inf ; parent\[v\] <- ⌀  
-dist\[s\] <- 0 ; Q <- file()  
-enfiler(Q, s)  
-tant que Q non vide:  
-u <- défiler(Q)  
-pour chaque voisin v de u:  
-si dist\[v\] = +inf:  
-dist\[v\] <- dist\[u\] + 1  
-parent\[v\] <- u  
-enfiler(Q, v)
+### Kruskal (arbre couvrant minimal)
 
-![title](Images/Picture2.png)
+Principe : tri des arêtes par poids croissant et ajout si les extrémités sont dans des composantes disjointes (
+Union-Find).
 
-### 4.2 Parcours en profondeur (DFS)
+Complexité : O(E log E).
 
-Principe : exploration récursive/itérative en profondeur. Invariants : temps d'entrée/sortie utiles pour détection de cycles et topologie (DAG). Complexité : O(V+E).
+![Kruskal.png](images/Kruskal.png)
+Ici, on sélectionne les arêtes de coût minimal en évitant de créer des cycles, jusqu'à ce que tous les sommets soient
+connectés.
 
-Pseudo-code DFS(G):  
-pour v in V: couleur\[v\] <- blanc ; parent\[v\] <- ⌀  
-pour v in V:  
-si couleur\[v\] = blanc:  
-DFS-Visite(v)  
-<br/>DFS-Visite(u):  
-couleur\[u\] <- gris  
-pour v voisin de u:  
-si couleur\[v\] = blanc: parent\[v\] <- u ; DFS-Visite(v)  
-couleur\[u\] <- noir
+### Prim (arbre couvrant minimal)
 
-![title](Images/Picture3.png)
+Principe : croissance d'un sous-ensemble de sommets en choisissant à chaque étape l'arête de coupe minimale via
+PriorityQueue.
 
-### 4.3 Dijkstra (plus court chemin, poids ≥ 0)
+Complexité : O(E log V).
 
-Principe : relaxation itérative des arêtes avec sélection du sommet non traité le plus proche via une file de priorité. Complexité typique : O((V+E) log V) avec tas binaire. Préconditions : poids non négatifs.
+![Prim.png](images/Prim.png)
+Ici, on choisit une ville puis on sélectionne l'arête de coût minimal vers un sommet adjacent et ainsi de suite en
+évitant les cycles jusqu'à ce que tous les sommets soient connectés.
 
-Pseudo-code Dijkstra(G, s):  
-pour v in V: dist\[v\] <- +inf ; parent\[v\] <- ⌀  
-dist\[s\] <- 0 ; PQ <- tas(min)  
-insérer(PQ, (0, s))  
-tant que PQ non vide:  
-(d, u) <- extraire-min(PQ)  
-si d > dist\[u\]: continuer  
-pour chaque arête (u, v, w):  
-si dist\[u\] + w < dist\[v\]:  
-dist\[v\] <- dist\[u\] + w ; parent\[v\] <- u  
-insérer(PQ, (dist\[v\], v))
+### Bellman-Ford
 
-![title](Images/Picture4.png)
-### 4.4 Kruskal (arbre couvrant minimal)
+Principe : relaxation répétée de toutes les arêtes pendant V−1 itérations afin de garantir la meilleure distance
+possible vers chaque sommet, même en présence de poids négatifs. Contrairement à Dijkstra, il n'utilise pas de structure
+de priorité mais met systématiquement à jour les distances pour chaque arête. Capacité supplémentaire : détection des
+cycles négatifs, en vérifiant s'il reste des améliorations possibles après les V−1 passages.
 
-Principe : tri des arêtes par poids croissant et ajout si les extrémités sont dans des composantes disjointes (Union-Find). Complexité : O(E log E).  
-Pseudo-code Kruskal(G):  
-T <- ∅ ; initialiser Union-Find sur V  
-trier E par poids croissant  
-pour (u, v) dans E triées:  
-si find(u) ≠ find(v):  
-T <- T ∪ {(u,v)} ; union(u, v)  
-retourner T  
-![title](Images/Picture5.png)
-### 4.5 Prim (arbre couvrant minimal)
+Complexité : O(V·E). Plus lent que Dijkstra, mais peut traiter les graphes avec des poids négatifs.
 
-Principe : croissance d'un sous-ensemble de sommets en choisissant à chaque étape l'arête de coupe minimale via PriorityQueue. Complexité : O(E log V).
+![BellmanFord.png](images/BellmanFord.png)
+Ici, on fait une file des sommets à traiter en y ajoutant chaque sommet adjacent rencontré pour chaque étape, on chosit
+les sommets dans l'ordre de la file et on met à
+jour les distances.
 
-Pseudo-code Prim(G, s):  
-pour v in V: key\[v\] <- +inf ; parent\[v\] <- ⌀  
-key\[s\] <- 0 ; PQ <- tas(min)  
-insérer(PQ, (0, s))  
-tant que PQ non vide:  
-(k, u) <- extraire-min(PQ)  
-pour chaque arête (u, v, w):  
-si v non inclus et w < key\[v\]:  
-key\[v\] <- w ; parent\[v\] <- u  
-insérer(PQ, (key\[v\], v))
+### Floyd-Warshall (tous les plus courts chemins)
 
-![title](Images/Picture6.png)
+Principe : DP sur triples boucles mettant à jour la matrice des distances par l'intermédiaire de sommets k.
 
-### 4.6 Floyd-Warshall (tous les plus courts chemins)
+Complexité :O(V^3).
 
-Principe : DP sur triples boucles mettant à jour la matrice des distances par l'intermédiaire de sommets k. Complexité : O(V^3). Peut être complété d'une matrice des prédécesseurs pour reconstruire les chemins.
+Peut être complété d'une matrice des prédécesseurs pour reconstruire les chemins.
 
-Pseudo-code Floyd-Warshall(G):  
-initialiser dist\[i\]\[j\] (0 si i=j, w(i,j) sinon, +inf si pas d'arête)  
-pour k in V:  
-pour i in V:  
-pour j in V:  
-dist\[i\]\[j\] <- min(dist\[i\]\[j\], dist\[i\]\[k\] + dist\[k\]\[j\])
+![FloydWarshall.png](images/FloydWarshall.png)
+Ici, on calcule les plus courts chemins entre toutes les paires de villes en considérant chaque ville intermédiaire
+possible, en rédigeant une matrice des distances.
 
-![title](Images/Picture7.png)
-## 5\. Implémentation dans ce projet
+## 🏗️ Fonctionnement global de l'application
 
-Contrôleur REST : endpoints POST à la racine (bfs, dfs, dijkstra, kruskal, prim, floydWarshall) et GET /hello. Chaque POST reçoit Map&lt;String, List<Neighbor&gt;> et renvoie List&lt;Edge&gt;. Les services appelés sont exposés via imports statiques (getBFS, getDFS, getDijkstra, getKruskal, getPrim, getFloydWarshall).
+Jeu de données : graphe de villes françaises donné dans le sujet (Paris, Lille, Rennes, Bordeaux...)
 
-Exemples d'appels:  
-POST /dijkstra?start=Bordeaux&end=Lille  
-Body: {"Bordeaux":\[{"ville":"Paris","distance":590}\],"Paris":\[{"ville":"Lille","distance":220}\],"Lille":\[\]}  
-Réponse: List&lt;Edge&gt; représentant le chemin dans l'ordre
+1. Envoie du graphe (avec possiblement des sommets sélectionnés) à l'algorithme choisi. **(front-end → Controller)**
+2. Exécution de l'algorithme demandé sur le graphe. **(Controller → Service)**
+3. Résultat de l'execution : détails de l'algorithme (arêtes parcourues, distances, matrices...) **(Service →
+   Controller)**
+4. Interprétation des résultats dans l'interface utilisateur. **(Controller → front-end)**
 
-Conversion JSON → Graph : GraphUtils.fromMap(...) crée Vertex/Edge et remplit la liste d'adjacence pour les deux extrémités (symétrique). Implication : les parcours et MST sont traités comme non orientés par défaut. Si un comportement orienté est requis, adapter la construction.
+| Algorithme       | Paramètres                | Résultat (ex.)                      | Mesure (valeur)    | Interprétation (qualitative)      |
+|------------------|---------------------------|-------------------------------------|--------------------|-----------------------------------|
+| BFS              | source=Rennes             | Edges parcourues = [...]            | Niveau max = …     | Couverture rapide des voisins     |
+| DFS              | source=Rennes             | Edges parcourues = [...]            | Profondeur max = … | Exploration en profondeur         |
+| Dijkstra         | start=Bordeaux,end=Lille  | Chemin = [Bordeaux, Paris, Lille]   | Distance = 810     | Cohérent avec la carte            |
+| **Bellman-Ford** | start=Rennes,end=Bordeaux | Chemin = [Rennes, Nantes, Bordeaux] | Distance = …       | Supporte poids négatifs / robuste |
+| Kruskal          | -                         | Arêtes MST = {...}                  | Coût total = …     | Comparé à Prim, très proche       |
+| Prim             | start=Paris               | Arêtes MST = {...}                  | Coût total = …     | Même coût attendu que Kruskal     |
+| Floyd-Warshall   | start=Paris,end=Rennes    | Matrice dist[i][j]                  | Δ vs Dijkstra = 0  | All-pairs cohérent                |
 
-## 6\. Protocole expérimental et résultats
+## Interprétation des résultats
 
-Jeu de données : graphe de villes françaises (ex. Paris, Lille, Rennes, Bordeaux, etc.). Protocole : (i) charger le graphe (front → API), (ii) exécuter chaque algorithme, (iii) collecter mesures : chemin retourné + distance (Dijkstra), coût total (Kruskal/Prim), ordre/edges parcourus (BFS/DFS), matrice des distances (Floyd-Warshall).
+### BFS et DFS
 
-| Algorithme | Paramètres | Résultat (ex.) | Mesure (valeur) | Interprétation (qualitative) |
-| --- | --- | --- | --- | --- |
-| BFS | source=Rennes | Edges parcourues = \[...\] | Niveau max = … | Couverture rapide des voisins |
-| DFS | source=Rennes | Edges parcourues = \[...\] | Profondeur max = … | Exploration en profondeur |
-| Dijkstra | start=Bordeaux,end=Lille | Chemin = \[Bordeaux, Paris, Lille\] | Distance = 810 | Cohérent avec la carte |
-| Kruskal | \-  | Arêtes MST = {...} | Coût total = … | Comparé à Prim, très proche |
-| Prim | start=Paris | Arêtes MST = {...} | Coût total = … | Même coût attendu que Kruskal |
-| Floyd-Warshall | \-  | Matrice dist\[i\]\[j\] | Δ vs Dijkstra = 0 | All-pairs cohérent |
+BFS et DFS explorent le graphe différemment. BFS atteint rapidement les sommets proches (niveaux faibles), tandis que
+DFS
+plonge profondément avant de revenir en arrière. Les arêtes parcourues diffèrent selon la stratégie (largeur vs
+profondeur).
 
-## 7\. Interprétation des résultats
+### Kruskal vs Prim
 
-• BFS vs DFS : BFS optimise la distance en nombre d'arêtes ; DFS privilégie l'exploration profonde - utile pour structure du graphe et détection de cycles.  
-• Dijkstra vs Floyd-Warshall : Dijkstra confirme les plus courts chemins point-à-point ; Floyd-Warshall doit retrouver la même distance pour chaque paire (sanity-check).  
-• Kruskal vs Prim : sur un même graphe pondéré connecté, les deux renvoient un MST de même coût ; des différences d'arêtes peuvent exister si égalités de poids.
+Kruskal et Prim trouveront des arbres couvrants minimaux de même coût total. Les arêtes sélectionnées peuvent différer
+selon la stratégie (global vs local).
 
-## 8\. Limites et améliorations possibles
+### Dijkstra vs Bellman-Ford
 
-• Orientation : la construction actuelle alimente l'adjacence des deux côtés ; pour des graphes orientés, différencier (sortants/entrants).  
-• Poids négatifs : prévoir Bellman-Ford si des distances négatives sont introduites ; vérifier la cohérence des services.  
-• Validation : détecter doublons d'arêtes, sommets isolés, self-loops ; normaliser la casse des noms de villes.  
-• Performance : utiliser PriorityQueue (Dijkstra/Prim), Union-Find optimisé (Kruskal), et profiling sur grands graphes.
+Dijkstra calcule efficacement les plus courts chemins sans poids négatifs grâce à une sélection gloutonne des distances
+minimales.
+Bellman-Ford, plus coûteux, gère les poids négatifs et signale les cycles négatifs lorsqu'ils existent.
 
-## 9\. Conclusion
+### Floyd-Warshall
 
-Le projet consolide la compréhension des parcours, des plus courts chemins et des arbres couvrants, depuis la théorie jusqu'à l'expérimentation. Les résultats attendus (coûts de MST, distances minimales) servent d'oracle pour valider l'implémentation et guider des améliorations futures (orientation, poids négatifs, interface).
+Floyd-Warshall fournit une matrice complète des plus courts chemins entre toutes paires de sommets. Les distances
+correspondent à celles obtenues par Dijkstra pour chaque paire, confirmant la cohérence des résultats.
+
+## 📈 Améliorations possibles
+
+Pour modifier le graphe, nous demandons à l'utilisateur de fournir un nouveau JSON en respectant la structure définie.
+
+Une amélioration possible serait d'ajouter une interface graphique pour éditer le graphe directement dans l'application.
+Cette décision permettrait à l'utilisateur de prendre en main plus facilement l'application sans avoir à manipuler des
+fichiers JSON.
+
+## ✅ Conclusion
+
+Ce projet nous a permis de découvrir d3.js, une bibliothèque front-end utile pour créer des graphes. Nous avons pu
+exposer nos compétences en termes d'architecture back-end avec Spring Boot et en implémentation d'algorithmes de graphes
+en Java. Ainsi qu'en developpement front-end avec une interface graphique qui utilise l'API back-end et réinterprète les
+données reçues.
