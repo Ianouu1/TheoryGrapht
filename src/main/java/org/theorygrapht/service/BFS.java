@@ -32,7 +32,7 @@ public class BFS {
                 if (!visited.contains(neighbor)) {
                     visited.add(neighbor);
                     queue.add(neighbor);
-                    traversalEdges.add(edge);
+                    traversalEdges.add(new Edge(current, neighbor, edge.getWeight()));
                 }
             }
         }

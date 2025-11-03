@@ -1,15 +1,20 @@
 import type { BFStep } from "../apiService";
+import TreeDiagram from "./TreeDiagram";
 
 export type EdgeRow = { source: string; target: string; weight: number };
 
 type ResultProps = {
   edgeList: EdgeRow[];
   bfTable?: BFStep[] | null;
+  algo?: string; // to detect BFS/DFS
+  startNode?: string; // root for BFS/DFS tree
 };
 
 // formatting is now done on the backend; no helper needed here
 
-export default function Result({ edgeList, bfTable }: ResultProps) {
+// tree helpers moved to TreeDiagram component
+
+export default function Result({ edgeList, bfTable, algo, startNode }: ResultProps) {
   // If Bellman-Ford table is present, render the table
   if (bfTable && bfTable.length > 0) {
     const vertices = Object.keys(bfTable[0].states);
@@ -108,7 +113,7 @@ export default function Result({ edgeList, bfTable }: ResultProps) {
     );
   }
 
-  // Default: render the edge list result
+  // Default: render the edge list result; if BFS/DFS, also show a simple tree
   return (
     <div className="card">
       <h2>Résultat {edgeList.length > 0 && `(${edgeList.length} arêtes)`}</h2>
@@ -123,6 +128,12 @@ export default function Result({ edgeList, bfTable }: ResultProps) {
               </li>
             ))}
           </ul>
+          {(algo === "bfs" || algo === "dfs") && (
+            <div style={{ marginTop: 10 }}>
+              <h3 style={{ margin: 0, fontSize: 16 }}>Arbre {algo?.toUpperCase()}</h3>
+              <TreeDiagram edges={edgeList} root={startNode} />
+            </div>
+          )}
           <hr style={{ border: "none", borderTop: "1px solid var(--border)", margin: "8px 0" }} />
           <p className="hint" style={{ fontWeight: "bold" }}>
             Total : {edgeList.reduce((sum, e) => sum + (Number(e.weight) || 0), 0)}

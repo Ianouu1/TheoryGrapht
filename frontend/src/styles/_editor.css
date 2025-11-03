@@ -1,0 +1,61 @@
+/* Minimal styles for the JSON editor box */
+.json-editor-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.json-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #e2e8f0;
+}
+
+.json-editor-mode {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.json-editor {
+  min-height: 200px;
+  resize: vertical;
+  background: #0b1220;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  padding: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 10px;
+}
+
+.json-editor-error {
+  color: #fecaca;
+  background: #7f1d1d;
+  border: 1px solid #ef4444;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.json-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.json-editor-actions button {
+  background: #1d4ed8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.json-editor-actions button:hover {
+  background: #2563eb;
+}

@@ -1,7 +1,7 @@
 import React from "react";
 import type { GraphNode } from "./Graph";
 
-interface AlgorithmPopupProps {
+interface VertexLauncher {
     algo: string;
     nodes: GraphNode[];
     startNode: string;
@@ -12,7 +12,7 @@ interface AlgorithmPopupProps {
     onCancel: () => void;
 }
 
-const AlgorithmPopup: React.FC<AlgorithmPopupProps> = ({
+const VertexLauncher: React.FC<VertexLauncher> = ({
                                                            algo,
                                                            nodes,
                                                            startNode,
@@ -82,4 +82,4 @@ const AlgorithmPopup: React.FC<AlgorithmPopupProps> = ({
     </div>
 );
 
-export default AlgorithmPopup;
+export default VertexLauncher;

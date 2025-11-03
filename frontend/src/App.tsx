@@ -16,12 +16,14 @@ import {
     type BFStep,
 } from "./apiService";
 import Toolbar from "./components/Toolbar";
-import AlgorithmPopup from "./components/AlgorithmPopup";
+import VertexLauncher from "./components/VertexLauncher.tsx";
 import Result from "./components/Result";
+import GraphJsonEditor from "./components/GraphJsonEditor";
 import "./App.css";
 import "./styles/_graph.css";
 import "./styles/_popup.css";
 import "./styles/_toolbar.css";
+import "./styles/_editor.css";
 
 const App: React.FC = () => {
     const [nodes, setNodes] = useState<GraphNode[]>([]);
@@ -73,7 +75,7 @@ const App: React.FC = () => {
         if (algorithm !== "bellmanford") {
             setBfTable(null);
         }
-    const adj = graphToAdjacency(nodes, links, directed);
+        const adj = graphToAdjacency(nodes, links, directed);
         let result: any;
 
         try {
@@ -119,7 +121,9 @@ const App: React.FC = () => {
                     await new Promise((resolve) => setTimeout(resolve, 100));
 
                     const newColorsBF: Record<string, string> = {};
-                    const edgesBF = (bfEdges || []).filter((e: any) => e.source && e.target);
+                    const edgesBF = Array.isArray(bfEdges)
+                        ? bfEdges.filter((e: any) => e.source && e.target)
+                        : [];
                     edgesBF.forEach((e: any, i: number) => {
                         const s = e.source.name || e.source;
                         const t = e.target.name || e.target;
@@ -175,6 +179,14 @@ const App: React.FC = () => {
         setBfTable(null);
     }
 
+    // Reload graph from edited JSON (already converted to nodes/links by child)
+    function handleReloadGraph(newNodes: GraphNode[], newLinks: GraphLink[]) {
+        setNodes(newNodes);
+        setLinks(newLinks);
+        // Clear any ongoing highlights/results when reloading graph
+        resetState();
+    }
+
     function handleLaunch() {
         if (!selectedAlgo) return;
         switch (selectedAlgo) {
@@ -201,6 +213,7 @@ const App: React.FC = () => {
         resetState();
     }
 
+    // @ts-ignore
     return (
         <div className="app">
             <Toolbar
@@ -231,7 +244,13 @@ const App: React.FC = () => {
                 </div>
 
                 <aside>
-                    <AlgorithmPopup
+                    <GraphJsonEditor
+                        nodes={nodes}
+                        links={links}
+                        directed={directed}
+                        onReloadGraph={handleReloadGraph}
+                    />
+                    <VertexLauncher
                         algo={selectedAlgo ?? ""}
                         nodes={nodes}
                         startNode={startNode}
@@ -242,7 +261,7 @@ const App: React.FC = () => {
                         onCancel={handleCancel}
                     />
 
-                    <Result edgeList={edgeList} bfTable={bfTable} />
+                    <Result edgeList={edgeList} bfTable={bfTable} algo={selectedAlgo ?? ""} startNode={startNode} />
                 </aside>
             </main>
         </div>

@@ -37,7 +37,7 @@ public class DFS {
                 if (!visited.contains(neighbor)) {
                     visited.add(neighbor);
                     stack.push(neighbor);
-                    traversalEdges.add(edge);
+                    traversalEdges.add(new Edge(current, neighbor, edge.getWeight()));
                 }
             }
         }

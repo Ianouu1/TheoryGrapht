@@ -140,11 +140,11 @@ const Toolbar: React.FC<ToolbarProps> = ({
             <div className="toolbar">
                 <div className="group">
                     <label>Algorithmes</label>
-                    <button onClick={() => handleAlgoClick("bfs")}>BFS</button>
-                    <button onClick={() => handleAlgoClick("dfs")}>DFS</button>
+                    <button onClick={() => handleAlgoClick("bfs")}>Parcours en largeur (BFS)</button>
+                    <button onClick={() => handleAlgoClick("dfs")}>Parcours en profondeur (DFS)</button>
                     <button onClick={() => handleAlgoClick("prim")}>Prim</button>
-                    <button onClick={() => handleAlgoClick("dijkstra")}>Dijkstra</button>
                     <button onClick={() => handleAlgoClick("kruskal")}>Kruskal</button>
+                    <button onClick={() => handleAlgoClick("dijkstra")}>Dijkstra</button>
                     <button onClick={() => handleAlgoClick("bellmanford")}>Bellman-Ford</button>
                     <button onClick={() => handleAlgoClick("floydwarshall")}>
                         Floyd-Warshall
