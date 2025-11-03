@@ -3,16 +3,24 @@ package org.theorygrapht.service;
 import org.theorygrapht.model.Edge;
 import org.theorygrapht.model.Graph;
 import org.theorygrapht.model.Vertex;
-import org.theorygrapht.util.DummyGraph;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.theorygrapht.util.GraphUtils.searchVertex;
 
+/**
+ * Algorithme de Prim pour l'arbre couvrant de poids minimal (MST).
+ */
 public class Prim {
+    /**
+     * Calcule un MST avec Prim en partant d'un sommet donné.
+     *
+     * @param graph               graphe non orienté et connexe
+     * @param startingVertexName  nom du sommet de départ
+     * @return liste d'arêtes qui composent le MST
+     * @throws IllegalArgumentException si le graphe est déconnecté
+     */
     public static List<Edge> getPrim(Graph graph, String startingVertexName) {
         Vertex[] vertices = graph.getVertices();
         Edge[] edges = graph.getEdges();
@@ -24,11 +32,11 @@ public class Prim {
 
         visitedVertices.add(start);
 
-        while (visitedVertices.size() != vertices.length) { // while not all vertices are visited
+        while (visitedVertices.size() != vertices.length) {
             Edge closestEdge = null;
             closestEdge = getClosestEdge(edges, visitedVertices, closestEdge);
 
-            if (closestEdge == null) { // if no valid edge is found (=disconnected graph)
+            if (closestEdge == null) {
                 throw new IllegalArgumentException("This is a disconnected graph");
             }
             visitedEdges.add(closestEdge);
@@ -49,7 +57,7 @@ public class Prim {
             boolean visitedSource = visited.contains(source);
             boolean visitedTarget = visited.contains(target);
 
-            if (visitedSource && !visitedTarget) { // If one vertex is visited and the other is not
+            if (visitedSource && !visitedTarget) {
                 if (closestEdge == null || edge.getWeight() < closestEdge.getWeight()) {
                     closestEdge = edge;
                 }

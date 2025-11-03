@@ -17,7 +17,7 @@ import static org.theorygrapht.service.DFS.getDFS;
 import static org.theorygrapht.service.Dijkstra.getDijkstra;
 import static org.theorygrapht.service.FloydWarshall.getFloydWarshall;
 import static org.theorygrapht.service.FloydWarshall.getMatrices;
-import org.theorygrapht.service.FloydWarshall.FloydResult;
+import org.theorygrapht.model.FloydResult;
 import static org.theorygrapht.service.Kruskal.getKruskal;
 import static org.theorygrapht.service.Prim.getPrim;
 

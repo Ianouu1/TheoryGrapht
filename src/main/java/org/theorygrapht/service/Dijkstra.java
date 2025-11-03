@@ -8,6 +8,9 @@ import java.util.*;
 
 import static org.theorygrapht.util.GraphUtils.searchVertex;
 
+/**
+ * Algorithme de Dijkstra (chemins les plus courts avec poids non négatifs).
+ */
 public class Dijkstra {
 
     private static class DijkstraResult {
@@ -28,7 +31,6 @@ public class Dijkstra {
         Map<Vertex, Integer> dist = new HashMap<>();
         Map<Vertex, Vertex> prev = new HashMap<>();
 
-        // Initialize all distances to infinity
         for (Vertex v : vertices) dist.put(v, Integer.MAX_VALUE);
         dist.put(start, 0);
 
@@ -48,7 +50,7 @@ public class Dijkstra {
                 if (alt < dist.get(neighbor)) {
                     dist.put(neighbor, alt);
                     prev.put(neighbor, u);
-                    pq.remove(neighbor); // refresh priority
+                    pq.remove(neighbor);
                     pq.add(neighbor);
                 }
             }
@@ -57,6 +59,14 @@ public class Dijkstra {
         return new DijkstraResult(dist, prev);
     }
 
+    /**
+     * Renvoie un plus court chemin entre deux sommets avec Dijkstra.
+     *
+     * @param graph     graphe d'entrée
+     * @param startName nom du sommet de départ
+     * @param endName   nom du sommet d'arrivée
+     * @return liste d'arêtes dans l'ordre du chemin (vide si inatteignable)
+     */
     public static List<Edge> getDijkstra(Graph graph, String startName, String endName) {
         DijkstraResult res = computeDijkstra(graph, startName);
         Vertex[] vertices = graph.getVertices();
@@ -66,7 +76,6 @@ public class Dijkstra {
         List<Edge> path = new ArrayList<>();
         Vertex current = end;
 
-        // Reconstruct path using predecessors
         while (res.prev.containsKey(current)) {
             Vertex predecessor = res.prev.get(current);
             for (Edge e : edges) {
@@ -83,6 +92,13 @@ public class Dijkstra {
         return path;
     }
 
+    /**
+     * Donne les distances finales depuis une source.
+     *
+     * @param graph     graphe d'entrée
+     * @param startName nom du sommet de départ
+     * @return map sommet -> distance (Integer.MAX_VALUE si inatteignable)
+     */
     public static Map<String, Integer> getDijkstraFinalMatrix(Graph graph, String startName) {
         DijkstraResult res = computeDijkstra(graph, startName);
 
@@ -93,6 +109,14 @@ public class Dijkstra {
         return result;
     }
 
+    /**
+     * Produit une table d'exécution de Dijkstra, itération par itération.
+     * Chaque ligne indique le sommet choisi et la meilleure distance connue pour tous les sommets.
+     *
+     * @param graph     graphe d'entrée
+     * @param startName nom du sommet de départ
+     * @return liste de lignes (colonnes -> valeurs)
+     */
     public static List<Map<String, String>> getDijkstraTable(Graph graph, String startName) {
         Vertex[] vertices = graph.getVertices();
         Edge[] edges = graph.getEdges();
@@ -101,14 +125,12 @@ public class Dijkstra {
         Map<Vertex, Integer> dist = new HashMap<>();
         Set<Vertex> visited = new HashSet<>();
 
-        // Initialize all distances to infinity
         for (Vertex v : vertices) dist.put(v, Integer.MAX_VALUE);
         dist.put(start, 0);
 
         PriorityQueue<Vertex> pq = new PriorityQueue<>(Comparator.comparingInt(dist::get));
         pq.add(start);
 
-        // Each element of the list will represent one iteration of Dijkstra
         List<Map<String, String>> table = new ArrayList<>();
 
         while (!pq.isEmpty()) {
@@ -117,16 +139,14 @@ public class Dijkstra {
             visited.add(u);
 
             Map<String, String> row = new LinkedHashMap<>();
-            row.put("C", u.getName() + ", " + dist.get(u)); // Column "C"
+            row.put("C", u.getName() + ", " + dist.get(u));
 
-            // For each vertex, store either "inf" or "(predecessor, cost)"
             for (Vertex v : vertices) {
                 if (v.equals(u)) {
                     row.put(v.getName(), "(" + u.getName() + ", " + dist.get(u) + ")");
                 } else if (visited.contains(v)) {
                     row.put(v.getName(), "-");
                 } else {
-                    // Try to find if a better path exists
                     int oldDist = dist.get(v);
                     for (Edge e : edges) {
                         if ((e.getSource().equals(u) && e.getTarget().equals(v)) ||
@@ -143,7 +163,6 @@ public class Dijkstra {
             }
             table.add(row);
 
-            // Add neighbors to queue
             for (Edge e : edges) {
                 if (e.getSource().equals(u) && !visited.contains(e.getTarget()))
                     pq.add(e.getTarget());
