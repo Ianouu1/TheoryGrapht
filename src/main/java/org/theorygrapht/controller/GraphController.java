@@ -25,11 +25,6 @@ import static org.theorygrapht.service.Prim.getPrim;
 @RestController
 public class GraphController {
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "Bienvenue sur mon API Spring Boot !";
-    }
-
     @PostMapping("/prim")
     public List<Edge> prim(@RequestBody Map<String, List<GraphInput.Neighbor>> graphJson,
                            @RequestParam String startingVertexName) {
